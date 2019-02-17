@@ -9,7 +9,7 @@ Instructions:-
 
 1. Create a package named "com.cmpe275.lab0" under src folder in a new lab0 project (Eclipse IDE).
 
-2. Download the Spring Framework and add Spring jar files to a new user library (v5.1.5 used in this project).
+2. Download the Spring Framework and add Spring jar files as a new user library in the project(v5.1.5 used in this project).
 
 3. Create an Interface class "Greeter" and a class "HelloWorld" which implements the interface Greeter. Create the main class with the name "MainApp" which contains the main method Along with these classes and interface we need to create an beans.xml file under src folder.
 
