@@ -1,8 +1,8 @@
-CMPE-275 
-Lab 0 - Hello World Spring Application
-Name - Shreyam Kela
-Student ID - 013775411
-Email ID- shreyamkela@gmail.com
+*CMPE-275* 
+- Lab 0 - Hello World Spring Application
+- Name - Shreyam Kela
+- Student ID - 013775411
+- Email ID- shreyamkela@gmail.com
 
 Instructions:-
 --------------
