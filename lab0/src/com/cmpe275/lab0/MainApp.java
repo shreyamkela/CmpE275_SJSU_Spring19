@@ -1,6 +1,11 @@
 package com.cmpe275.lab0;
 
 // Add Spring Jar Files to the project
+/*
+For a Java Project then create user library with all jar files and add that library as a user library
+to the project. For a Dynamic Web Project add all these jar files from libs folder of spring framework zip
+to project in Eclipse. We need to copy these jar files to lib folder which is found under web Content/WEB-INF.
+*/
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
