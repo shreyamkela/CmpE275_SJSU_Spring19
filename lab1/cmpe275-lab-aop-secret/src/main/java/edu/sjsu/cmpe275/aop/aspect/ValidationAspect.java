@@ -14,7 +14,7 @@ public class ValidationAspect {
 	 */
 
 	@Before("validateCreateSecretPointcut()")
-	public void validateCreateSecretArguments(JoinPoint joinPoint) {
+	public void validateCreateSecretArguments(JoinPoint joinPoint) throws Throwable {
 		System.out.printf("Doing validation prior to the execution of the method %s\n\n",
 				joinPoint.getSignature().getName());
 		// joinPoint.getArgs().length - length of the getArgs array - to get the number of arguments passed
@@ -29,6 +29,7 @@ public class ValidationAspect {
 		// XXXXXXXXXXXXXXXXXXXXXXXX RESOLVED - COUNT NEXTLINE CHAR/ENTER/LINE BREAK AS A CHAR IN SECRET CONTENT? - ECLIPSE IS INTRODUCING NEXTLINE CHAR BY ITSELF, IF THE MESSAGE TYPED HAD SOME ENTER PRESSES - CHECK FOR "\r\n", "\n"?
 		// XXXXXXXXXXXXXXXXXXXXXXXX RESOLVED - COUNT NEXTLINE CHAR/ENTER AS A CHAR IN SECRET?
 		// XXXXXXXXXXXXXXXXXXXXXXXX RESOLVED - REMOVE STARTING OR ENDING WHITESPACES?
+		// XXXXXXXXXXXXXXXXXXXXXXXX IS throws throwable REQUIRED EVERYWHERE?
 
 		if (joinPoint.getArgs()[0] == null) {
 			System.out.printf("XXXXXXXXXXXXXXXXXXXXXXXX USER ID IS NULL!!!!!!!\n\n");
@@ -57,7 +58,7 @@ public class ValidationAspect {
 	}
 
 	@Before("validateReadSecretPointcut()")
-	public void validateReadSecretArguments(JoinPoint joinPoint) {
+	public void validateReadSecretArguments(JoinPoint joinPoint) throws Throwable {
 		System.out.printf("\nDoing validation prior to the execution of the method %s\n\n",
 				joinPoint.getSignature().getName());
 
@@ -77,7 +78,7 @@ public class ValidationAspect {
 	}
 
 	@Before("validateShareOrUnshareSecretPointcut()")
-	public void validateShareOrUnshareSecretArguments(JoinPoint joinPoint) {
+	public void validateShareOrUnshareSecretArguments(JoinPoint joinPoint) throws Throwable {
 		System.out.printf("\nDoing validation prior to the execution of the method %s\n\n",
 				joinPoint.getSignature().getName());
 
