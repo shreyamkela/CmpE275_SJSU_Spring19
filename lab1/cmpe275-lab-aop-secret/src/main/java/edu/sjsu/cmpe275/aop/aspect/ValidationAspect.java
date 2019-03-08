@@ -14,7 +14,7 @@ public class ValidationAspect {
 	 */
 
 	@Before("validateCreateSecretPointcut()")
-	public void validateCreationArguments(JoinPoint joinPoint) {
+	public void validateCreateSecretArguments(JoinPoint joinPoint) {
 		System.out.printf("Doing validation prior to the execution of the method %s\n\n",
 				joinPoint.getSignature().getName());
 		// joinPoint.getArgs().length - length of the getArgs array - to get the number of arguments passed
@@ -57,13 +57,13 @@ public class ValidationAspect {
 	}
 
 	@Before("validateReadSecretPointcut()")
-	public void validateReadingArguments(JoinPoint joinPoint) {
+	public void validateReadSecretArguments(JoinPoint joinPoint) {
 		System.out.printf("\nDoing validation prior to the execution of the method %s\n\n",
 				joinPoint.getSignature().getName());
 
 		if (joinPoint.getArgs()[0] == null) {
-			System.out.printf("XXXXXXXXXXXXXXXXXXXXXXXX USER ID OF READER IS NULL!!!!!!!\n\n");
-			throw new IllegalArgumentException("USER ID OF READER IS NULL");
+			System.out.printf("XXXXXXXXXXXXXXXXXXXXXXXX USER ID OF TARGET USER IS NULL!!!!!!!\n\n");
+			throw new IllegalArgumentException("USER ID OF TARGET USER IS NULL");
 		}
 		if (joinPoint.getArgs()[1] == null) {
 			System.out.printf("XXXXXXXXXXXXXXXXXXXXXXXX SECRET IS NULL!!!!!!!\n\n");
@@ -74,6 +74,29 @@ public class ValidationAspect {
 
 	@Pointcut("execution(public * edu.sjsu.cmpe275.aop.SecretService.readSecret(..))")
 	public void validateReadSecretPointcut() {
+	}
+
+	@Before("validateShareOrUnshareSecretPointcut()")
+	public void validateShareOrUnshareSecretArguments(JoinPoint joinPoint) {
+		System.out.printf("\nDoing validation prior to the execution of the method %s\n\n",
+				joinPoint.getSignature().getName());
+
+		if (joinPoint.getArgs()[0] == null) {
+			System.out.printf("XXXXXXXXXXXXXXXXXXXXXXXX USER ID OF CURRENT USER IS NULL!!!!!!!\n\n");
+			throw new IllegalArgumentException("USER ID OF CURRENT USER IS NULL");
+		}
+		if (joinPoint.getArgs()[1] == null) {
+			System.out.printf("XXXXXXXXXXXXXXXXXXXXXXXX SECRET IS NULL!!!!!!!\n\n");
+			throw new IllegalArgumentException("SECRET IS NULL");
+		}
+		if (joinPoint.getArgs()[2] == null) {
+			System.out.printf("XXXXXXXXXXXXXXXXXXXXXXXX USER ID OF TARGET USER IS NULL!!!!!!!\n\n");
+			throw new IllegalArgumentException("USER ID OF TARGET USER IS NULL");
+		}
+	}
+
+	@Pointcut("execution(public * edu.sjsu.cmpe275.aop.SecretService.shareSecret(..)) || execution(public * edu.sjsu.cmpe275.aop.SecretService.unshareSecret(..))")
+	public void validateShareOrUnshareSecretPointcut() {
 	}
 
 }
