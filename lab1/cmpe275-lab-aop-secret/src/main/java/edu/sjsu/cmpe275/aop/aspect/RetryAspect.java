@@ -18,15 +18,27 @@ public class RetryAspect {
 		System.out.printf("XXXXXXXXXXXXXXXX Retry aspect prior to the execution of the method %s\n",
 				joinPoint.getSignature().getName());
 
-		joinPoint.proceed();
 		try {
 			return joinPoint.proceed();
-//			System.out.printf("Finished the execution of the method %s with result %s\n",
-//					joinPoint.getSignature().getName(), result);
-		} catch (Throwable e) {
-			e.printStackTrace();
-			return null;
-//			System.out.printf("Aborted the execution of the method %s\n", joinPoint.getSignature().getName());
+		} catch (Throwable e1) {
+
+			try {
+				System.out.printf("Retrying %s for the 1st time\n", joinPoint.getSignature().getName());
+				return joinPoint.proceed();
+
+			} catch (Throwable e2) {
+				try {
+					System.out.printf("Retrying %s for the 2nd time\n", joinPoint.getSignature().getName());
+					return joinPoint.proceed();
+				} catch (Throwable e3) {
+					System.out.printf("Aborted the execution of the method %s\n", joinPoint.getSignature().getName());
+					e3.printStackTrace();
+					// XXXXXXXXXXXXXXXXXXXXXXXXXXX THROW NEW IOEXCEPTION?
+					// XXXXXXXXXXXXXXXXXXXXXXXXXXX CHECK INTERMIXED ASPECTS EXCEPTIONS? DO I CHECK FOR VALIDATION ASPECT HERE & VICE VERSA
+					return null;
+				}
+			}
+
 		}
 	}
 

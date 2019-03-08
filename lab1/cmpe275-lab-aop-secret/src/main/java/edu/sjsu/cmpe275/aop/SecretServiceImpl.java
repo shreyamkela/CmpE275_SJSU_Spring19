@@ -8,10 +8,7 @@ import java.util.UUID;
 public class SecretServiceImpl implements SecretService {
 
 	/***
-	 * Important: While you can tweak this implementation to suit your need for
-	 * debugging purpose, this file is NOT part of your submission, and the
-	 * correctness of your submission CANNOT depend on your implementation of this
-	 * class.
+	 * Important: While you can tweak this implementation to suit your need for debugging purpose, this file is NOT part of your submission, and the correctness of your submission CANNOT depend on your implementation of this class.
 	 */
 
 	Map<UUID, Secret> secrets = new HashMap<UUID, Secret>();
@@ -30,7 +27,8 @@ public class SecretServiceImpl implements SecretService {
 			throws IOException, IllegalArgumentException, NotAuthorizedException {
 		Secret secret = secrets.get(secretId);
 		System.out.printf("User %s reads secret: %s\n", userId, secret);
-		return secret;
+		throw new IOException("Retry");
+		// return secret;
 	}
 
 	@Override
