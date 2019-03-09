@@ -19,7 +19,6 @@ public class App {
 			// XXXXXXXXXXXXXXXXXX HOW TO THROW? AND SHOULD CODE RUN AFTER ANY THROW? - DONE THE CHECK FOR PERMANENT NETWORK FAILURE WHEN SHARING A SECRET SO THAT THIS SECRET IS NOT COUNTED AS A SHARED SECRET
 			UUID secret = secretService.createSecret("Alice", "My little secret");
 			secretService.shareSecret("Alice", secret, "Kevin");
-
 			secretService.readSecret("Bob", secret);
 			secretService.unshareSecret("Alice", secret, "Bob");
 		} catch (Exception e) {
@@ -29,6 +28,7 @@ public class App {
 		System.out.println("Best known secret: " + stats.getBestKnownSecret());
 		System.out.println("Worst secret keeper: " + stats.getWorstSecretKeeper());
 		System.out.println("Most trusted user: " + stats.getMostTrustedUser());
+		System.out.println("Longest secret created: " + stats.getLengthOfLongestSecret());
 		ctx.close();
 	}
 }

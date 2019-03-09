@@ -8,8 +8,9 @@ public class SecretStatsImpl implements SecretStats {
 	 * Following is a dummy implementation. You are expected to provide an actual implementation based on the requirements.
 	 */
 
-	public int longestOfLongestSecret = 0;
+	public int lengthOfLongestSecret = 0;
 	public String mostTrustedUser = null;
+	public String bestKnownSecret = null;
 	public boolean permanentNetworkFailure = false;
 
 	// Alice shares secret A with Bob
@@ -19,14 +20,15 @@ public class SecretStatsImpl implements SecretStats {
 
 	@Override
 	public void resetStatsAndSystem() {
-		// TODO Auto-generated method stub
-		longestOfLongestSecret = 0;
-
+		lengthOfLongestSecret = 0;
+		mostTrustedUser = null;
+		bestKnownSecret = null;
+		permanentNetworkFailure = false;
 	}
 
 	@Override
 	public int getLengthOfLongestSecret() {
-		return longestOfLongestSecret;
+		return lengthOfLongestSecret;
 	}
 
 	@Override
@@ -67,7 +69,7 @@ public class SecretStatsImpl implements SecretStats {
 	@Override
 	public String getBestKnownSecret() {
 		// TODO Auto-generated method stub
-		return null;
+		return bestKnownSecret;
 	}
 
 }

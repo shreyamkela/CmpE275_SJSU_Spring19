@@ -4,7 +4,10 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
+
+import edu.sjsu.cmpe275.aop.SecretStatsImpl;
 
 @Aspect
 @Order(1)
@@ -12,6 +15,9 @@ public class ValidationAspect {
 	/***
 	 * Following is a dummy implementation of this aspect. You are expected to provide an actual implementation based on the requirements, including adding/removing advices as needed.
 	 */
+
+	@Autowired
+	SecretStatsImpl stats;
 
 	@Before("validateCreateSecretPointcut()")
 	public void validateCreateSecretAdvice(JoinPoint joinPoint) throws Throwable {
@@ -45,10 +51,13 @@ public class ValidationAspect {
 //			System.out.printf("XXXXXXXXXXXXXXXXXXXXXXXX SECRET CONTENT EXCEEDS CHARACTER LIMIT!!!!!!!!\n\n");
 //		}
 		if (joinPoint.getArgs()[1] != null) {
-			if (joinPoint.getArgs()[1].toString().length() > 100) {
+			int secretContentLength = joinPoint.getArgs()[1].toString().length();
+			if (secretContentLength > 100) {
 				System.out.printf("XXXXXXXXXXXXXXXXXXXXXXXX SECRET CONTENT EXCEEDS CHARACTER LIMIT!!!!!!!!\n\n");
 				throw new IllegalArgumentException("SECRET CONTENT EXCEEDS CHARACTER LIMIT");
 				// XXXXXXXXXXXXXXXXXXXXXXXX USING e.printstackthrow INSTEAD OF throw new?
+			} else if (secretContentLength > stats.lengthOfLongestSecret) {
+				stats.lengthOfLongestSecret = secretContentLength;
 			}
 		}
 
