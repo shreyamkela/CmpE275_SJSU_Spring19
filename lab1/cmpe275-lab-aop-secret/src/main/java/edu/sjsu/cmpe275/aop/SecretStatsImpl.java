@@ -9,6 +9,8 @@ public class SecretStatsImpl implements SecretStats {
 	 */
 
 	public int longestOfLongestSecret = 0;
+	public String mostTrustedUser = null;
+	public boolean permanentNetworkFailure = false;
 
 	// Alice shares secret A with Bob
 	// Alice shares secret B with Bob
@@ -29,8 +31,31 @@ public class SecretStatsImpl implements SecretStats {
 
 	@Override
 	public String getMostTrustedUser() {
-		// TODO Auto-generated method stub
-		return null;
+		if (sharedSecrets != null) {
+			HashMap<String, HashSet<String>> innerHashMap = new HashMap<String, HashSet<String>>();
+			HashSet<String> innerHashSet = new HashSet<String>();
+
+			int maxSharingOccurences = 0;
+
+			for (String keyOuterMap : sharedSecrets.keySet()) {
+				int temp = 0;
+				innerHashMap = sharedSecrets.get(keyOuterMap);
+				for (String keyInnerMap : innerHashMap.keySet()) {
+					innerHashSet = innerHashMap.get(keyInnerMap);
+					temp = temp + innerHashSet.size();
+				}
+				if (maxSharingOccurences < temp) {
+					maxSharingOccurences = temp;
+					mostTrustedUser = keyOuterMap;
+				} else if (maxSharingOccurences == temp && maxSharingOccurences != 0) {
+					// Checking for a tie case
+					if (mostTrustedUser.compareTo(keyOuterMap) > 0) {
+						mostTrustedUser = keyOuterMap;
+					}
+				}
+			}
+		}
+		return mostTrustedUser;
 	}
 
 	@Override

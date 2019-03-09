@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.After;
+import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ public class StatsAspect {
 	@Autowired
 	SecretStatsImpl stats;
 
-	@After("mostTrustedUserPointcut()")
+	@AfterReturning("mostTrustedUserPointcut()")
 	public void mostTrustedUserAdvice(JoinPoint joinPoint) {
 		System.out.printf("\nAfter the execution of the method %s\n", joinPoint.getSignature().getName());
 		String sharerId = joinPoint.getArgs()[0].toString();
@@ -33,25 +33,30 @@ public class StatsAspect {
 		HashMap<String, HashSet<String>> innerHashMap = new HashMap<String, HashSet<String>>();
 		HashSet<String> innerHashSet = new HashSet<String>();
 
-		if (sharerId == targetId) {
+		if (sharerId == targetId || stats.permanentNetworkFailure == true) {
 			return;
 		}
 
 		if (stats.sharedSecrets.containsKey(targetId)) {
+			System.out.printf("\nAAAAAAAAAAAAA %s %s %s\n", sharerId, secretId, targetId);
+
 			// If targetId present
 			innerHashMap = stats.sharedSecrets.get(targetId);
 			if (innerHashMap.containsKey(sharerId)) {
 				// If sharer id present inside the hashmap of target id
+				System.out.printf("\nBBBBBBBBBBBB %s %s %s\n", sharerId, secretId, targetId);
 				innerHashSet = innerHashMap.get(sharerId);
 				innerHashSet.add(secretId);
 				// An element is added to hashset only when it is not already present. Otherwise it returns false. Therefore we dont need to check whether the key secretId is already present in the set or not.
 			} else {
 				// If sharer id not present inside the hashmap of target id
+				System.out.printf("\nCCCCCCCCCCCC %s %s %s\n", sharerId, secretId, targetId);
 				innerHashSet.add(secretId);
 				innerHashMap.put(sharerId, innerHashSet);
 			}
 		} else {
 			// If targetId not present
+			System.out.printf("\nDDDDDDDDDDDDDDD %s %s %s\n", sharerId, secretId, targetId);
 			innerHashSet.add(secretId);
 			innerHashMap.put(sharerId, innerHashSet);
 			stats.sharedSecrets.put(targetId, innerHashMap);
