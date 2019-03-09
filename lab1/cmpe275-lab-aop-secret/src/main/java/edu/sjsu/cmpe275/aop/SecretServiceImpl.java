@@ -19,6 +19,7 @@ public class SecretServiceImpl implements SecretService {
 		Secret secret = new Secret(secretContent);
 		UUID id = secret.getId();
 		secrets.put(id, secret);
+
 		return id;
 	}
 
@@ -34,7 +35,7 @@ public class SecretServiceImpl implements SecretService {
 	@Override
 	public void shareSecret(String userId, UUID secretId, String targetUserId)
 			throws IOException, IllegalArgumentException, NotAuthorizedException {
-		System.out.printf("XXXXXXXXXXXXXXXXXXXX User %s shares secret: %s\n", userId, secretId);
+		System.out.printf("User %s shares secret: %s\n", userId, secretId);
 	}
 
 	@Override

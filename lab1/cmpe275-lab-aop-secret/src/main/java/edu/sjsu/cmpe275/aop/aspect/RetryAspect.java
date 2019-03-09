@@ -26,17 +26,20 @@ public class RetryAspect {
 		stats.permanentNetworkFailure = false;
 
 		try {
-			return joinPoint.proceed();
+			Object[] args = joinPoint.getArgs();
+			return joinPoint.proceed(args);
 		} catch (Throwable e1) {
 
 			try {
 				System.out.printf("Retrying %s for the 1st time\n", joinPoint.getSignature().getName());
-				return joinPoint.proceed();
+				Object[] args = joinPoint.getArgs();
+				return joinPoint.proceed(args);
 
 			} catch (Throwable e2) {
 				try {
 					System.out.printf("Retrying %s for the 2nd time\n", joinPoint.getSignature().getName());
-					return joinPoint.proceed();
+					Object[] args = joinPoint.getArgs();
+					return joinPoint.proceed(args);
 				} catch (Throwable e3) {
 					System.out.printf("Aborted the execution of the method %s due to permanent network failure\n",
 							joinPoint.getSignature().getName());

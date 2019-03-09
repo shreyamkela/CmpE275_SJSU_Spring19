@@ -1,6 +1,10 @@
 package edu.sjsu.cmpe275.aop.aspect;
 
+import java.util.UUID;
+
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
@@ -19,10 +23,12 @@ public class ValidationAspect {
 	@Autowired
 	SecretStatsImpl stats;
 
-	@Before("validateCreateSecretPointcut()")
-	public void validateCreateSecretAdvice(JoinPoint joinPoint) throws Throwable {
+	@Around("validateCreateSecretPointcut()")
+	public UUID validateCreateSecretAdvice(ProceedingJoinPoint joinPoint) throws Throwable {
+
 		System.out.printf("Doing validation prior to the execution of the method %s\n\n",
 				joinPoint.getSignature().getName());
+
 		// joinPoint.getArgs().length - length of the getArgs array - to get the number of arguments passed
 
 		// joinPoint.getArgs()[0]: Object containing the userid passed. Validation - User id object can be null or user id object can contain a string which is empty
@@ -38,12 +44,13 @@ public class ValidationAspect {
 		// XXXXXXXXXXXXXXXXXXXXXXXX IS throws throwable REQUIRED EVERYWHERE?
 
 		if (joinPoint.getArgs()[0] == null) {
-			System.out.printf("XXXXXXXXXXXXXXXXXXXXXXXX USER ID IS NULL!!!!!!!\n\n");
-			throw new IllegalArgumentException("USER ID IS NULL");
-//		} else if (joinPoint.getArgs()[0].toString().length() == 0) {
+			// System.out.printf("XXXXXXXXXXXXXXXXXXXXXXXX USER ID IS NULL!!!!!!!\n\n");
+			throw new IllegalArgumentException();
+		}
+//			else if (joinPoint.getArgs()[0].toString().length() == 0) {
 //			System.out.printf("XXXXXXXXXXXXXXXXXXXXXXXX USER ID IS EMPTY!!!!!!!\n\n");
 //			throw new IllegalArgumentException("USER ID IS EMPTY");
-		}
+//		}
 
 //		if (joinPoint.getArgs()[1] == null) {
 //			System.out.printf("XXXXXXXXXXXXXXXXXXXXXXXX SECRET CONTENT IS NULL!!!!!!!\n\n");
@@ -53,12 +60,21 @@ public class ValidationAspect {
 		if (joinPoint.getArgs()[1] != null) {
 			int secretContentLength = joinPoint.getArgs()[1].toString().length();
 			if (secretContentLength > 100) {
-				System.out.printf("XXXXXXXXXXXXXXXXXXXXXXXX SECRET CONTENT EXCEEDS CHARACTER LIMIT!!!!!!!!\n\n");
-				throw new IllegalArgumentException("SECRET CONTENT EXCEEDS CHARACTER LIMIT");
+				// System.out.printf("XXXXXXXXXXXXXXXXXXXXXXXX SECRET CONTENT EXCEEDS CHARACTER LIMIT!!!!!!!!\n\n");
+				throw new IllegalArgumentException();
 				// XXXXXXXXXXXXXXXXXXXXXXXX USING e.printstackthrow INSTEAD OF throw new?
 			} else if (secretContentLength > stats.lengthOfLongestSecret) {
 				stats.lengthOfLongestSecret = secretContentLength;
+				Object[] args = joinPoint.getArgs();
+				return (UUID) joinPoint.proceed(args);
+				// Statsaspect uses @AfterReturning on createSecret and validationaspect uses @Around on createSecret. @Around will run first. We want returnValue of createSecret into @AfterReturning therefore we must pass the returnValue through @Around return
+			} else {
+				Object[] args = joinPoint.getArgs();
+				return (UUID) joinPoint.proceed(args);
 			}
+		} else {
+			Object[] args = joinPoint.getArgs();
+			return (UUID) joinPoint.proceed(args);
 		}
 
 	}
@@ -69,16 +85,17 @@ public class ValidationAspect {
 
 	@Before("validateReadSecretPointcut()")
 	public void validateReadSecretAdvice(JoinPoint joinPoint) throws Throwable {
+
 		System.out.printf("\nDoing validation prior to the execution of the method %s\n\n",
 				joinPoint.getSignature().getName());
 
 		if (joinPoint.getArgs()[0] == null) {
-			System.out.printf("XXXXXXXXXXXXXXXXXXXXXXXX USER ID OF TARGET USER IS NULL!!!!!!!\n\n");
-			throw new IllegalArgumentException("USER ID OF TARGET USER IS NULL");
+			// System.out.printf("XXXXXXXXXXXXXXXXXXXXXXXX USER ID OF TARGET USER IS NULL!!!!!!!\n\n");
+			throw new IllegalArgumentException();
 		}
 		if (joinPoint.getArgs()[1] == null) {
-			System.out.printf("XXXXXXXXXXXXXXXXXXXXXXXX SECRET IS NULL!!!!!!!\n\n");
-			throw new IllegalArgumentException("SECRET IS NULL");
+			// System.out.printf("XXXXXXXXXXXXXXXXXXXXXXXX SECRET IS NULL!!!!!!!\n\n");
+			throw new IllegalArgumentException();
 		}
 
 	}
@@ -87,23 +104,19 @@ public class ValidationAspect {
 	public void validateReadSecretPointcut() {
 	}
 
-	@Before("validateShareOrUnshareSecretPointcut()")
-	public void validateShareOrUnshareSecretAdvice(JoinPoint joinPoint) throws Throwable {
+	@Around("validateShareOrUnshareSecretPointcut()")
+	public void validateShareOrUnshareSecretAdvice(ProceedingJoinPoint joinPoint) throws Throwable {
 		System.out.printf("\nDoing validation prior to the execution of the method %s\n\n",
 				joinPoint.getSignature().getName());
 
-		if (joinPoint.getArgs()[0] == null) {
-			System.out.printf("XXXXXXXXXXXXXXXXXXXXXXXX USER ID OF CURRENT USER IS NULL!!!!!!!\n\n");
-			throw new IllegalArgumentException("USER ID OF CURRENT USER IS NULL");
+		if (joinPoint.getArgs()[0] == null || joinPoint.getArgs()[1] == null || joinPoint.getArgs()[2] == null) {
+			throw new IllegalArgumentException();
+		} else {
+			Object[] args = joinPoint.getArgs();
+			System.out.println("RRRRRRRRRRRRRRRRR");
+			joinPoint.proceed(args);
 		}
-		if (joinPoint.getArgs()[1] == null) {
-			System.out.printf("XXXXXXXXXXXXXXXXXXXXXXXX SECRET IS NULL!!!!!!!\n\n");
-			throw new IllegalArgumentException("SECRET IS NULL");
-		}
-		if (joinPoint.getArgs()[2] == null) {
-			System.out.printf("XXXXXXXXXXXXXXXXXXXXXXXX USER ID OF TARGET USER IS NULL!!!!!!!\n\n");
-			throw new IllegalArgumentException("USER ID OF TARGET USER IS NULL");
-		}
+
 	}
 
 	@Pointcut("execution(public * edu.sjsu.cmpe275.aop.SecretService.shareSecret(..)) || execution(public * edu.sjsu.cmpe275.aop.SecretService.unshareSecret(..))")

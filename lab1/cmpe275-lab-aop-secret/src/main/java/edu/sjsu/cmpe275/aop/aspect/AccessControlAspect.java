@@ -15,8 +15,9 @@ public class AccessControlAspect {
 
 	@Before("accessControlPointcut()")
 	public void accessControlAdvice(JoinPoint joinPoint) {
-		System.out.printf("Access control prior to the execution of the method %s\n",
+		System.out.printf("XXXXXXXXXXXXX Access control prior to the execution of the method %s\n",
 				joinPoint.getSignature().getName());
+
 	}
 
 	@Pointcut("execution(public * edu.sjsu.cmpe275.aop.SecretService.readSecret(..)) || execution(public * edu.sjsu.cmpe275.aop.SecretService.shareSecret(..)) || execution(public * edu.sjsu.cmpe275.aop.SecretService.unshareSecret(..))")

@@ -36,16 +36,24 @@ public class SecretStatsImpl implements SecretStats {
 	// Outer Hashmap key = Alice, value is Bob (which is inner hashmap key). The value of inner hashmap is a hashset with keys A and B
 	public HashMap<String, HashMap<String, HashSet<String>>> creatorSecrets = new HashMap<String, HashMap<String, HashSet<String>>>();
 
+	// For access control - check whether a user has access to a secret or not:
+	// Alice creates a secret A
+	// Outer Hashmap key = Alice, value is inner hashset with key A
+	// Alice shares secret A with Bob
+	// Outer Hashmap key = Bob, value is inner hashset with key A
+	public HashMap<String, HashSet<String>> accessToSecrets = new HashMap<String, HashSet<String>>();
+
 	@Override
 	public void resetStatsAndSystem() {
 		lengthOfLongestSecret = 0;
 		mostTrustedUser = null;
 		worstSecretKeeper = null;
 		bestKnownSecret = null;
-		sharedSecrets = new HashMap<String, HashMap<String, HashSet<String>>>();
-		knownSecrets = new HashMap<String, HashSet<String>>();
-		secretIdWithCreatorAndContent = new HashMap<String, ArrayList<String>>();
-		creatorSecrets = new HashMap<String, HashMap<String, HashSet<String>>>();
+		sharedSecrets.clear();
+		knownSecrets.clear();
+		secretIdWithCreatorAndContent.clear();
+		creatorSecrets.clear();
+		accessToSecrets.clear();
 		permanentNetworkFailure = false;
 
 	}
@@ -97,8 +105,8 @@ public class SecretStatsImpl implements SecretStats {
 	public String getWorstSecretKeeper() {
 
 		if (sharedSecrets != null && creatorSecrets != null) {
-			System.out.println(sharedSecrets);
-			System.out.println(creatorSecrets);
+//			System.out.println(sharedSecrets);
+//			System.out.println(creatorSecrets);
 
 			HashMap<String, HashSet<String>> innerHashMap = new HashMap<String, HashSet<String>>();
 			HashSet<String> innerHashSet = new HashSet<String>();
