@@ -11,6 +11,7 @@ public class SecretStatsImpl implements SecretStats {
 
 	public int lengthOfLongestSecret = 0;
 	public String mostTrustedUser = null;
+	public String worstSecretKeeper = null;
 	public String bestKnownSecret = null;
 	public boolean permanentNetworkFailure = false;
 
@@ -29,13 +30,22 @@ public class SecretStatsImpl implements SecretStats {
 	// For keeping a record of all secret contents and creatorID with their UUID Strings :
 	public HashMap<String, ArrayList<String>> secretIdWithCreatorAndContent = new HashMap<String, ArrayList<String>>();
 
+	// For worst secret keeper (similar to Most trusted user):
+	// Alice shares secret A with Bob
+	// Alice shares secret B with Bob
+	// Outer Hashmap key = Alice, value is Bob (which is inner hashmap key). The value of inner hashmap is a hashset with keys A and B
+	public HashMap<String, HashMap<String, HashSet<String>>> creatorSecrets = new HashMap<String, HashMap<String, HashSet<String>>>();
+
 	@Override
 	public void resetStatsAndSystem() {
 		lengthOfLongestSecret = 0;
 		mostTrustedUser = null;
+		worstSecretKeeper = null;
 		bestKnownSecret = null;
 		sharedSecrets = new HashMap<String, HashMap<String, HashSet<String>>>();
 		knownSecrets = new HashMap<String, HashSet<String>>();
+		secretIdWithCreatorAndContent = new HashMap<String, ArrayList<String>>();
+		creatorSecrets = new HashMap<String, HashMap<String, HashSet<String>>>();
 		permanentNetworkFailure = false;
 
 	}
@@ -55,19 +65,28 @@ public class SecretStatsImpl implements SecretStats {
 
 			for (String keyOuterMap : sharedSecrets.keySet()) {
 				int temp = 0;
-				innerHashMap = sharedSecrets.get(keyOuterMap);
-				for (String keyInnerMap : innerHashMap.keySet()) {
-					innerHashSet = innerHashMap.get(keyInnerMap);
-					temp = temp + innerHashSet.size();
+				if (sharedSecrets.get(keyOuterMap) != null) { // sharedSecrets should have a key then only we move forwards
+					innerHashMap = sharedSecrets.get(keyOuterMap);
+					for (String keyInnerMap : innerHashMap.keySet()) {
+						if (innerHashMap.get(keyInnerMap) != null) {
+							innerHashSet = innerHashMap.get(keyInnerMap);
+
+							temp = temp + innerHashSet.size();
+						}
+
+					}
 				}
+
 				if (maxSharingOccurences < temp) {
 					maxSharingOccurences = temp;
 					mostTrustedUser = keyOuterMap;
-				} else if (maxSharingOccurences == temp && maxSharingOccurences != 0) {
+				} else if (maxSharingOccurences == temp && maxSharingOccurences != 0 && mostTrustedUser != null) {
 					// Checking for a tie case
+
 					if (mostTrustedUser.compareTo(keyOuterMap) > 0) {
 						mostTrustedUser = keyOuterMap;
 					}
+
 				}
 			}
 		}
@@ -76,8 +95,67 @@ public class SecretStatsImpl implements SecretStats {
 
 	@Override
 	public String getWorstSecretKeeper() {
-		// TODO Auto-generated method stub
-		return null;
+
+		if (sharedSecrets != null && creatorSecrets != null) {
+			System.out.println(sharedSecrets);
+			System.out.println(creatorSecrets);
+
+			HashMap<String, HashSet<String>> innerHashMap = new HashMap<String, HashSet<String>>();
+			HashSet<String> innerHashSet = new HashSet<String>();
+
+			HashMap<String, HashSet<String>> innerHashMap1 = new HashMap<String, HashSet<String>>();
+			HashSet<String> innerHashSet1 = new HashSet<String>();
+
+			int secretKeepingScore = 0, count = 0;
+
+			for (String keyOuterMap : creatorSecrets.keySet()) {
+				int secretSharingCount = 0, secretReceiveingCount = 0;
+
+				if (creatorSecrets.get(keyOuterMap) != null) { // sharedSecrets should have a key then only we move forwards
+					innerHashMap = creatorSecrets.get(keyOuterMap);
+					for (String keyInnerMap : innerHashMap.keySet()) {
+						if (innerHashMap.get(keyInnerMap) != null) {
+							innerHashSet = innerHashMap.get(keyInnerMap);
+							secretSharingCount = secretSharingCount + innerHashSet.size();
+						}
+
+					}
+				}
+
+				if (sharedSecrets.get(keyOuterMap) != null) {
+					innerHashMap1 = sharedSecrets.get(keyOuterMap);
+					for (String keyInnerMap : innerHashMap1.keySet()) {
+						if (innerHashMap1.get(keyInnerMap) != null) {
+							innerHashSet1 = innerHashMap1.get(keyInnerMap);
+							secretReceiveingCount = secretReceiveingCount + innerHashSet1.size();
+						}
+					}
+				}
+
+				if (count == 0) {
+					secretKeepingScore = secretReceiveingCount - secretSharingCount;
+					worstSecretKeeper = keyOuterMap;
+					// System.out.println("GGGGGGGGGGGGGG" + worstSecretKeeper);
+					count++;
+				} else {
+					if ((secretReceiveingCount - secretSharingCount) < secretKeepingScore) {
+						secretKeepingScore = secretReceiveingCount - secretSharingCount;
+						worstSecretKeeper = keyOuterMap;
+						// System.out.println("FFFFFFFFFFFF" + worstSecretKeeper);
+					} else if ((secretReceiveingCount - secretSharingCount) == secretKeepingScore
+							&& (secretReceiveingCount != 0 || secretSharingCount != 0) && worstSecretKeeper != null) {
+						if (worstSecretKeeper.compareTo(keyOuterMap) > 0) {
+
+							worstSecretKeeper = keyOuterMap;
+
+						}
+					}
+				}
+
+			}
+		}
+		return worstSecretKeeper;
+
 	}
 
 	@Override
@@ -94,9 +172,8 @@ public class SecretStatsImpl implements SecretStats {
 					// innerHashSet contains all the user that this secret was shared with. If innerhashset.soze == 1 and innerhashset contains only the creator of this secret himself, then it means no one has read this secret and only creator knows about this secret,
 					// therefore we dont count this case
 					String creator = null;
-					System.out.println(secretIdWithCreatorAndContent);
-					System.out.println(key);
-
+//					System.out.println(secretIdWithCreatorAndContent);
+//					System.out.println(key);
 					for (String keyId : secretIdWithCreatorAndContent.keySet()) {
 						if (secretIdWithCreatorAndContent.get(keyId).get(1) == key) {
 							creator = secretIdWithCreatorAndContent.get(keyId).get(0);

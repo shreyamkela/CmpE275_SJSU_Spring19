@@ -83,7 +83,7 @@ public class StatsAspect {
 
 		HashSet<String> innerHashSet = new HashSet<String>();
 		ArrayList<String> creatorAndContent = new ArrayList<String>();
-		String userId, secretContent = null;
+		String userId = null, secretContent = null, sharerId = null, secretId = null;
 
 		if (joinPoint.getArgs().length == 2) { // The method is createSecret
 			userId = joinPoint.getArgs()[0].toString(); // This user gets to know this secret
@@ -92,10 +92,12 @@ public class StatsAspect {
 			creatorAndContent.add(secretContent); // Adding the secret content
 			stats.secretIdWithCreatorAndContent.put(returnValue.toString(), creatorAndContent); // returnValue stores the return value of the createSecret method i.e the uuid. secretIdWithContent stores the uuid string with the creator id and secret contents
 		} else {// The method is shareSecrect
-			userId = joinPoint.getArgs()[2].toString(); // This user gets to know this secret
+			userId = joinPoint.getArgs()[2].toString(); // This user gets to know this secret - this user is target user
 			secretContent = stats.secretIdWithCreatorAndContent.get(joinPoint.getArgs()[1].toString()).get(1); // joinPoint.getArgs()[1] here is the secret id i.e UUID.
+			sharerId = joinPoint.getArgs()[0].toString();
 		}
 
+		// For bestknownsecret:
 		if (stats.knownSecrets.containsKey(secretContent)) {
 			(stats.knownSecrets.get(secretContent)).add(userId);
 			// An element is added to hashset only when it is not already present. Otherwise it returns false. Therefore we dont need to check whether the key userid is already present in the set or not.
@@ -103,6 +105,42 @@ public class StatsAspect {
 			// If secret id not present
 			innerHashSet.add(userId);
 			stats.knownSecrets.put(secretContent, innerHashSet);
+		}
+
+		// For worstSecretKeeper:
+		if (joinPoint.getArgs().length == 3) {
+			if (sharerId == userId) {
+				return;
+			}
+			secretId = joinPoint.getArgs()[1].toString();
+
+			HashMap<String, HashSet<String>> innerHashMap = new HashMap<String, HashSet<String>>();
+			HashSet<String> innerHashSet1 = new HashSet<String>();
+
+			if (stats.creatorSecrets.containsKey(sharerId)) {
+				// If sharerId present
+				innerHashMap = stats.creatorSecrets.get(sharerId);
+				if (innerHashMap.containsKey(userId)) {
+					// If user/target id present inside the hashmap of sharer id
+					//
+//					innerHashSet1 = innerHashMap.get(userId);
+//					innerHashSet1.add(secretId);
+					stats.creatorSecrets.get(sharerId).get(userId).add(secretId);
+					// An element is added to hashset only when it is not already present. Otherwise it returns false. Therefore we dont need to check whether the key secretId is already present in the set or not.
+				} else {
+					// If user id not present inside the hashmap of sharer id
+					// System.out.printf("\nCCCCCCCCCCCC %s %s %s\n", sharerId, secretId, targetId);
+					innerHashSet1.add(secretId);
+					// innerHashMap.put(sharerId, innerHashSet1);
+					stats.creatorSecrets.get(sharerId).put(sharerId, innerHashSet1);
+				}
+			} else {
+				// If sharer not present
+				innerHashSet1.add(secretId);
+				innerHashMap.put(userId, innerHashSet1);
+				stats.creatorSecrets.put(sharerId, innerHashMap);
+			}
+
 		}
 
 		// stats.resetStats();
