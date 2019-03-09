@@ -15,8 +15,7 @@ public class RetryAspect {
 
 	@Around("networkFailureRetryPointcut()")
 	public Object networkFailureRetryAdvice(ProceedingJoinPoint joinPoint) throws Throwable { // @around should always return something an object
-		System.out.printf("XXXXXXXXXXXXXXXX Retry aspect prior to the execution of the method %s\n",
-				joinPoint.getSignature().getName());
+		System.out.printf("Retry aspect prior to the execution of the method %s\n", joinPoint.getSignature().getName());
 
 		try {
 			return joinPoint.proceed();

@@ -1,9 +1,12 @@
 package edu.sjsu.cmpe275.aop.aspect;
 
+import java.util.HashMap;
+import java.util.HashSet;
+
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 
@@ -19,15 +22,46 @@ public class StatsAspect {
 	@Autowired
 	SecretStatsImpl stats;
 
-	@After("execution(public void edu.sjsu.cmpe275.aop.SecretService.*(..))")
-	public void dummyAfterAdvice(JoinPoint joinPoint) {
-		// System.out.printf("After the executuion of the metohd %s\n", joinPoint.getSignature().getName());
+	@After("mostTrustedUserPointcut()")
+	public void mostTrustedUserAdvice(JoinPoint joinPoint) {
+		System.out.printf("\nAfter the execution of the method %s\n", joinPoint.getSignature().getName());
+		String sharerId = joinPoint.getArgs()[0].toString();
+		String secretId = joinPoint.getArgs()[1].toString();
+		String targetId = joinPoint.getArgs()[2].toString();
+		System.out.printf("\nXXXXXXXXXXXXX %s %s %s\n", sharerId, secretId, targetId);
+
+		HashMap<String, HashSet<String>> innerHashMap = new HashMap<String, HashSet<String>>();
+		HashSet<String> innerHashSet = new HashSet<String>();
+
+		if (sharerId == targetId) {
+			return;
+		}
+
+		if (stats.sharedSecrets.containsKey(targetId)) {
+			// If targetId present
+			innerHashMap = stats.sharedSecrets.get(targetId);
+			if (innerHashMap.containsKey(sharerId)) {
+				// If sharer id present inside the hashmap of target id
+				innerHashSet = innerHashMap.get(sharerId);
+				innerHashSet.add(secretId);
+				// An element is added to hashset only when it is not already present. Otherwise it returns false. Therefore we dont need to check whether the key secretId is already present in the set or not.
+			} else {
+				// If sharer id not present inside the hashmap of target id
+				innerHashSet.add(secretId);
+				innerHashMap.put(sharerId, innerHashSet);
+			}
+		} else {
+			// If targetId not present
+			innerHashSet.add(secretId);
+			innerHashMap.put(sharerId, innerHashSet);
+			stats.sharedSecrets.put(targetId, innerHashMap);
+		}
+
 		// stats.resetStats();
 	}
 
-	@Before("execution(public void edu.sjsu.cmpe275.aop.SecretService.*(..))")
-	public void dummyBeforeAdvice(JoinPoint joinPoint) {
-		// System.out.printf("Doing stats before the executuion of the metohd %s\n", joinPoint.getSignature().getName());
+	@Pointcut("execution(public * edu.sjsu.cmpe275.aop.SecretService.shareSecret(..))")
+	public void mostTrustedUserPointcut() {
 	}
 
 }

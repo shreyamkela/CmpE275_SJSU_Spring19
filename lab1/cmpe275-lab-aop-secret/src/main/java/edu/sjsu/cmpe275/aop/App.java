@@ -16,7 +16,6 @@ public class App {
 
 		try {
 			UUID secret = secretService.createSecret("Alice", "My little secret");
-			System.out.println(secret);
 			secretService.shareSecret("Alice", secret, "Bob");
 			secretService.readSecret("Bob", secret);
 			secretService.unshareSecret("Alice", secret, "Bob");

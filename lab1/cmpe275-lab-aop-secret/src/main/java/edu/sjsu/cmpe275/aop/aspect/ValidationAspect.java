@@ -14,7 +14,7 @@ public class ValidationAspect {
 	 */
 
 	@Before("validateCreateSecretPointcut()")
-	public void validateCreateSecretArguments(JoinPoint joinPoint) throws Throwable {
+	public void validateCreateSecretAdvice(JoinPoint joinPoint) throws Throwable {
 		System.out.printf("Doing validation prior to the execution of the method %s\n\n",
 				joinPoint.getSignature().getName());
 		// joinPoint.getArgs().length - length of the getArgs array - to get the number of arguments passed
@@ -48,6 +48,7 @@ public class ValidationAspect {
 			if (joinPoint.getArgs()[1].toString().length() > 100) {
 				System.out.printf("XXXXXXXXXXXXXXXXXXXXXXXX SECRET CONTENT EXCEEDS CHARACTER LIMIT!!!!!!!!\n\n");
 				throw new IllegalArgumentException("SECRET CONTENT EXCEEDS CHARACTER LIMIT");
+				// XXXXXXXXXXXXXXXXXXXXXXXX USING e.printstackthrow INSTEAD OF throw new?
 			}
 		}
 
@@ -58,7 +59,7 @@ public class ValidationAspect {
 	}
 
 	@Before("validateReadSecretPointcut()")
-	public void validateReadSecretArguments(JoinPoint joinPoint) throws Throwable {
+	public void validateReadSecretAdvice(JoinPoint joinPoint) throws Throwable {
 		System.out.printf("\nDoing validation prior to the execution of the method %s\n\n",
 				joinPoint.getSignature().getName());
 
@@ -78,7 +79,7 @@ public class ValidationAspect {
 	}
 
 	@Before("validateShareOrUnshareSecretPointcut()")
-	public void validateShareOrUnshareSecretArguments(JoinPoint joinPoint) throws Throwable {
+	public void validateShareOrUnshareSecretAdvice(JoinPoint joinPoint) throws Throwable {
 		System.out.printf("\nDoing validation prior to the execution of the method %s\n\n",
 				joinPoint.getSignature().getName());
 

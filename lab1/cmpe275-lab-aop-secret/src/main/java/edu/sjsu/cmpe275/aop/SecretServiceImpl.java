@@ -27,8 +27,8 @@ public class SecretServiceImpl implements SecretService {
 			throws IOException, IllegalArgumentException, NotAuthorizedException {
 		Secret secret = secrets.get(secretId);
 		System.out.printf("User %s reads secret: %s\n", userId, secret);
-		throw new IOException("Retry");
-		// return secret;
+		// throw new IOException("Retry");
+		return secret;
 	}
 
 	@Override
