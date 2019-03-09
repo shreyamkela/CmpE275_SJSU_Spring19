@@ -1,5 +1,6 @@
 package edu.sjsu.cmpe275.aop.aspect;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -22,13 +23,14 @@ public class StatsAspect {
 	@Autowired
 	SecretStatsImpl stats;
 
+	// XXXXXXXXXXXXXXXXX AFTER RETURNING CORRECT?
 	@AfterReturning("mostTrustedUserPointcut()")
 	public void mostTrustedUserAdvice(JoinPoint joinPoint) {
 		System.out.printf("\nAfter the execution of the method %s\n", joinPoint.getSignature().getName());
 		String sharerId = joinPoint.getArgs()[0].toString();
 		String secretId = joinPoint.getArgs()[1].toString();
 		String targetId = joinPoint.getArgs()[2].toString();
-		System.out.printf("\nXXXXXXXXXXXXX %s %s %s\n", sharerId, secretId, targetId);
+		// System.out.printf("\nXXXXXXXXXXXXX %s %s %s\n", sharerId, secretId, targetId);
 
 		HashMap<String, HashSet<String>> innerHashMap = new HashMap<String, HashSet<String>>();
 		HashSet<String> innerHashSet = new HashSet<String>();
@@ -38,25 +40,25 @@ public class StatsAspect {
 		}
 
 		if (stats.sharedSecrets.containsKey(targetId)) {
-			System.out.printf("\nAAAAAAAAAAAAA %s %s %s\n", sharerId, secretId, targetId);
+			// System.out.printf("\nAAAAAAAAAAAAA %s %s %s\n", sharerId, secretId, targetId);
 
 			// If targetId present
 			innerHashMap = stats.sharedSecrets.get(targetId);
 			if (innerHashMap.containsKey(sharerId)) {
 				// If sharer id present inside the hashmap of target id
-				System.out.printf("\nBBBBBBBBBBBB %s %s %s\n", sharerId, secretId, targetId);
+				// System.out.printf("\nBBBBBBBBBBBB %s %s %s\n", sharerId, secretId, targetId);
 				innerHashSet = innerHashMap.get(sharerId);
 				innerHashSet.add(secretId);
 				// An element is added to hashset only when it is not already present. Otherwise it returns false. Therefore we dont need to check whether the key secretId is already present in the set or not.
 			} else {
 				// If sharer id not present inside the hashmap of target id
-				System.out.printf("\nCCCCCCCCCCCC %s %s %s\n", sharerId, secretId, targetId);
+				// System.out.printf("\nCCCCCCCCCCCC %s %s %s\n", sharerId, secretId, targetId);
 				innerHashSet.add(secretId);
 				innerHashMap.put(sharerId, innerHashSet);
 			}
 		} else {
 			// If targetId not present
-			System.out.printf("\nDDDDDDDDDDDDDDD %s %s %s\n", sharerId, secretId, targetId);
+			// System.out.printf("\nDDDDDDDDDDDDDDD %s %s %s\n", sharerId, secretId, targetId);
 			innerHashSet.add(secretId);
 			innerHashMap.put(sharerId, innerHashSet);
 			stats.sharedSecrets.put(targetId, innerHashMap);
@@ -67,6 +69,43 @@ public class StatsAspect {
 
 	@Pointcut("execution(public * edu.sjsu.cmpe275.aop.SecretService.shareSecret(..))")
 	public void mostTrustedUserPointcut() {
+	}
+
+	// XXXXXXXXXXXXXXXXX AFTER RETURNING CORRECT?
+	@AfterReturning(pointcut = "execution(public * edu.sjsu.cmpe275.aop.SecretService.shareSecret(..)) || execution(public * edu.sjsu.cmpe275.aop.SecretService.createSecret(..))", returning = "returnValue")
+	public void bestKnownSecretAdvice(JoinPoint joinPoint, Object returnValue) { // This is the syntax when we need to use the return value of the method that the advice is applied upon
+		System.out.printf("\nKKKKKKKKKKKKKK After the execution of the method %s\n",
+				joinPoint.getSignature().getName());
+
+		if (stats.permanentNetworkFailure == true) {
+			return;
+		}
+
+		HashSet<String> innerHashSet = new HashSet<String>();
+		ArrayList<String> creatorAndContent = new ArrayList<String>();
+		String userId, secretContent = null;
+
+		if (joinPoint.getArgs().length == 2) { // The method is createSecret
+			userId = joinPoint.getArgs()[0].toString(); // This user gets to know this secret
+			secretContent = joinPoint.getArgs()[1].toString();
+			creatorAndContent.add(userId); // Adding the creator of this secret
+			creatorAndContent.add(secretContent); // Adding the secret content
+			stats.secretIdWithCreatorAndContent.put(returnValue.toString(), creatorAndContent); // returnValue stores the return value of the createSecret method i.e the uuid. secretIdWithContent stores the uuid string with the creator id and secret contents
+		} else {// The method is shareSecrect
+			userId = joinPoint.getArgs()[2].toString(); // This user gets to know this secret
+			secretContent = stats.secretIdWithCreatorAndContent.get(joinPoint.getArgs()[1].toString()).get(1); // joinPoint.getArgs()[1] here is the secret id i.e UUID.
+		}
+
+		if (stats.knownSecrets.containsKey(secretContent)) {
+			(stats.knownSecrets.get(secretContent)).add(userId);
+			// An element is added to hashset only when it is not already present. Otherwise it returns false. Therefore we dont need to check whether the key userid is already present in the set or not.
+		} else {
+			// If secret id not present
+			innerHashSet.add(userId);
+			stats.knownSecrets.put(secretContent, innerHashSet);
+		}
+
+		// stats.resetStats();
 	}
 
 }
