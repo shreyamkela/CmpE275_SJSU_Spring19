@@ -5,9 +5,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class SecretStatsImpl implements SecretStats {
-	/***
-	 * Following is a dummy implementation. You are expected to provide an actual implementation based on the requirements.
-	 */
 
 	public int lengthOfLongestSecret = 0;
 	public String mostTrustedUser = null;
@@ -105,8 +102,6 @@ public class SecretStatsImpl implements SecretStats {
 	public String getWorstSecretKeeper() {
 
 		if (sharedSecrets != null && creatorSecrets != null) {
-//			System.out.println(sharedSecrets);
-//			System.out.println(creatorSecrets);
 
 			HashMap<String, HashSet<String>> innerHashMap = new HashMap<String, HashSet<String>>();
 			HashSet<String> innerHashSet = new HashSet<String>();
@@ -143,13 +138,11 @@ public class SecretStatsImpl implements SecretStats {
 				if (count == 0) {
 					secretKeepingScore = secretReceiveingCount - secretSharingCount;
 					worstSecretKeeper = keyOuterMap;
-					// System.out.println("GGGGGGGGGGGGGG" + worstSecretKeeper);
 					count++;
 				} else {
 					if ((secretReceiveingCount - secretSharingCount) < secretKeepingScore) {
 						secretKeepingScore = secretReceiveingCount - secretSharingCount;
 						worstSecretKeeper = keyOuterMap;
-						// System.out.println("FFFFFFFFFFFF" + worstSecretKeeper);
 					} else if ((secretReceiveingCount - secretSharingCount) == secretKeepingScore
 							&& (secretReceiveingCount != 0 || secretSharingCount != 0) && worstSecretKeeper != null) {
 						if (worstSecretKeeper.compareTo(keyOuterMap) > 0) {

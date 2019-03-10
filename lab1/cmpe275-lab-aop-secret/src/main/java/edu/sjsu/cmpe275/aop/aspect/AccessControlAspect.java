@@ -13,9 +13,6 @@ import edu.sjsu.cmpe275.aop.SecretStatsImpl;
 @Aspect
 @Order(3) // By specifying the order number we can control which aspect runs first at any particular joinpoint, if there are clashing aspects wanting to run on the same joinpoint
 public class AccessControlAspect {
-	/***
-	 * Following is a dummy implementation of this aspect. You are expected to provide an actual implementation based on the requirements, including adding/removing advices as needed.
-	 */
 
 	@Autowired
 	SecretStatsImpl stats;
@@ -27,8 +24,8 @@ public class AccessControlAspect {
 			return null;
 		}
 
-		System.out.printf("\nAccess control prior to the execution of the method %s\n",
-				joinPoint.getSignature().getName());
+//		System.out.printf("\nAccess control prior to the execution of the method %s\n",
+//				joinPoint.getSignature().getName());
 
 		String readerId = null, sharerUnsharerId = null, secretId = null;
 

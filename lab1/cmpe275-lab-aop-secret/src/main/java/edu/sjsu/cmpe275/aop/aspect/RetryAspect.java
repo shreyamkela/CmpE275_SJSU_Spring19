@@ -14,16 +14,13 @@ import edu.sjsu.cmpe275.aop.SecretStatsImpl;
 @Aspect
 @Order(1) // By specifying the order number we can control which aspect runs first at any particular joinpoint, if there are clashing aspects wanting to run on the same joinpoint
 public class RetryAspect {
-	/***
-	 * Following is a dummy implementation of this aspect. You are expected to provide an actual implementation based on the requirements, including adding/removing advices as needed.
-	 */
 
 	@Autowired
 	SecretStatsImpl stats;
 
 	@Around("networkFailureRetryPointcut()")
 	public Object networkFailureRetryAdvice(ProceedingJoinPoint joinPoint) throws Throwable { // @around should always return something an object
-		System.out.printf("Retry aspect prior to the execution of the method %s\n", joinPoint.getSignature().getName());
+		// System.out.printf("Retry aspect prior to the execution of the method %s\n", joinPoint.getSignature().getName());
 
 		stats.permanentNetworkFailure = false;
 		String raisedException = null, requiredException = "IOException";
@@ -53,11 +50,7 @@ public class RetryAspect {
 										"Aborted the execution of the method %s due to permanent network failure\n",
 										joinPoint.getSignature().getName());
 								stats.permanentNetworkFailure = true;
-
-								// XXXXXXXXXXXXXXXXXXXXXXXXXXX THROW NEW IOEXCEPTION?
-								// XXXXXXXXXXXXXXXXXXXXXXXXXXX CHECK INTERMIXED ASPECTS EXCEPTIONS? DO I CHECK FOR VALIDATION ASPECT HERE & VICE VERSA
 								// e3.printStackTrace();
-								// return null;
 								throw new IOException();
 							}
 
@@ -66,7 +59,6 @@ public class RetryAspect {
 
 				}
 			} else { // If exception is something other than IOexception i/e network exception
-
 				throw e1;
 			}
 		}

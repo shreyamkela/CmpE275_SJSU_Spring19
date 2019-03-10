@@ -22,11 +22,10 @@ public class StatsAspect {
 	@Autowired
 	SecretStatsImpl stats;
 
-	// XXXXXXXXXXXXXXXXX AFTER RETURNING CORRECT?
 	@AfterReturning(pointcut = "execution(public * edu.sjsu.cmpe275.aop.SecretService.shareSecret(..)) || execution(public * edu.sjsu.cmpe275.aop.SecretService.createSecret(..))", returning = "returnValue")
 	public void statsAdvice(JoinPoint joinPoint, Object returnValue) { // This is the syntax when we need to use the return value of the method that the advice is applied upon
-		System.out.printf("\nAfter the execution of the method %s\n", joinPoint.getSignature().getName());
-// After returning is used therefore we dont have to check for network failure
+		// System.out.printf("\nAfter the execution of the method %s\n", joinPoint.getSignature().getName());
+		// After returning is used therefore we dont have to check for network failure
 		HashSet<String> innerHashSet = new HashSet<String>();
 		ArrayList<String> creatorAndContent = new ArrayList<String>();
 		String userId = null, secretContent = null, sharerId = null, secretId = null;
@@ -74,14 +73,12 @@ public class StatsAspect {
 				innerHashMap = stats.creatorSecrets.get(sharerId);
 				if (innerHashMap.containsKey(userId)) {
 					// If user/target id present inside the hashmap of sharer id
-					//
-//					innerHashSet1 = innerHashMap.get(userId);
-//					innerHashSet1.add(secretId);
+
 					stats.creatorSecrets.get(sharerId).get(userId).add(secretId);
 					// An element is added to hashset only when it is not already present. Otherwise it returns false. Therefore we dont need to check whether the key secretId is already present in the set or not.
 				} else {
 					// If user id not present inside the hashmap of sharer id
-					// System.out.printf("\nCCCCCCCCCCCC %s %s %s\n", sharerId, secretId, targetId);
+
 					innerHashSet1.add(secretId);
 					// innerHashMap.put(sharerId, innerHashSet1);
 					stats.creatorSecrets.get(sharerId).put(sharerId, innerHashSet1);
@@ -94,12 +91,11 @@ public class StatsAspect {
 			}
 
 			// FOR MOST TRUSTED USER
-			System.out.printf("\nAfter the execution of the method %s\n", joinPoint.getSignature().getName());
+			// System.out.printf("\nAfter the execution of the method %s\n", joinPoint.getSignature().getName());
 
 			sharerId = joinPoint.getArgs()[0].toString();
 			secretId = joinPoint.getArgs()[1].toString();
 			String targetId = joinPoint.getArgs()[2].toString();
-			// System.out.printf("\nXXXXXXXXXXXXX %s %s %s\n", sharerId, secretId, targetId);
 
 			innerHashMap = new HashMap<String, HashSet<String>>();
 			innerHashSet = new HashSet<String>();
@@ -109,25 +105,20 @@ public class StatsAspect {
 			}
 
 			if (stats.sharedSecrets.containsKey(targetId)) {
-				// System.out.printf("\nAAAAAAAAAAAAA %s %s %s\n", sharerId, secretId, targetId);
-
 				// If targetId present
 				innerHashMap = stats.sharedSecrets.get(targetId);
 				if (innerHashMap.containsKey(sharerId)) {
 					// If sharer id present inside the hashmap of target id
-					// System.out.printf("\nBBBBBBBBBBBB %s %s %s\n", sharerId, secretId, targetId);
 					innerHashSet = innerHashMap.get(sharerId);
 					innerHashSet.add(secretId);
 					// An element is added to hashset only when it is not already present. Otherwise it returns false. Therefore we dont need to check whether the key secretId is already present in the set or not.
 				} else {
 					// If sharer id not present inside the hashmap of target id
-					// System.out.printf("\nCCCCCCCCCCCC %s %s %s\n", sharerId, secretId, targetId);
 					innerHashSet.add(secretId);
 					innerHashMap.put(sharerId, innerHashSet);
 				}
 			} else {
 				// If targetId not present
-				// System.out.printf("\nDDDDDDDDDDDDDDD %s %s %s\n", sharerId, secretId, targetId);
 				innerHashSet.add(secretId);
 				innerHashMap.put(sharerId, innerHashSet);
 				stats.sharedSecrets.put(targetId, innerHashMap);
@@ -180,7 +171,7 @@ public class StatsAspect {
 	// For access control: unshareSecret
 	@AfterReturning(pointcut = "execution(public * edu.sjsu.cmpe275.aop.SecretService.unshareSecret(..)))", returning = "returnValue")
 	public void AccessControlUnshareSecretAdvice(JoinPoint joinPoint, Object returnValue) {
-		System.out.printf("\nAfter the execution of the method %s\n", joinPoint.getSignature().getName());
+		// System.out.printf("\nAfter the execution of the method %s\n", joinPoint.getSignature().getName());
 
 		if (stats.permanentNetworkFailure == true) {
 			return;
