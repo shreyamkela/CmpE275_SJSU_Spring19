@@ -12,7 +12,7 @@ import org.springframework.core.annotation.Order;
 import edu.sjsu.cmpe275.aop.SecretStatsImpl;
 
 @Aspect
-@Order(1)
+@Order(0) // By specifying the order number we can control which aspect runs first at any particular joinpoint, if there are clashing aspects wanting to run on the same joinpoint
 public class RetryAspect {
 	/***
 	 * Following is a dummy implementation of this aspect. You are expected to provide an actual implementation based on the requirements, including adding/removing advices as needed.
