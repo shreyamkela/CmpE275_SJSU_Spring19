@@ -25,6 +25,9 @@ public class App {
 			secretService.readSecret("Bob", secret);
 			secretService.unshareSecret("Paul", secret, "Bob");
 			secretService.readSecret("Bob", secret);
+			stats.resetStatsAndSystem();
+			UUID secret2 = secretService.createSecret("Alice", "My little secret");
+			secretService.shareSecret("Alice", secret2, "Bob");
 
 		} catch (Exception e) {
 			e.printStackTrace();
