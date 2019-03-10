@@ -26,10 +26,7 @@ public class StatsAspect {
 	@AfterReturning(pointcut = "execution(public * edu.sjsu.cmpe275.aop.SecretService.shareSecret(..)) || execution(public * edu.sjsu.cmpe275.aop.SecretService.createSecret(..))", returning = "returnValue")
 	public void statsAdvice(JoinPoint joinPoint, Object returnValue) { // This is the syntax when we need to use the return value of the method that the advice is applied upon
 		System.out.printf("\nAfter the execution of the method %s\n", joinPoint.getSignature().getName());
-		if (stats.permanentNetworkFailure == true) {
-			return;
-		}
-
+// After returning is used therefore we dont have to check for network failure
 		HashSet<String> innerHashSet = new HashSet<String>();
 		ArrayList<String> creatorAndContent = new ArrayList<String>();
 		String userId = null, secretContent = null, sharerId = null, secretId = null;
@@ -42,6 +39,7 @@ public class StatsAspect {
 
 			stats.secretIdWithCreatorAndContent.put(returnValue.toString(), creatorAndContent); // returnValue stores the return value of the createSecret method i.e the uuid. secretIdWithContent stores the uuid string with the creator id and secret contents
 		} else {// The method is shareSecrect
+
 			userId = joinPoint.getArgs()[2].toString(); // This user gets to know this secret - this user is target user
 			secretContent = stats.secretIdWithCreatorAndContent.get(joinPoint.getArgs()[1].toString()).get(1); // joinPoint.getArgs()[1] here is the secret id i.e UUID.
 			sharerId = joinPoint.getArgs()[0].toString();
@@ -93,9 +91,7 @@ public class StatsAspect {
 
 			// FOR MOST TRUSTED USER
 			System.out.printf("\nAfter the execution of the method %s\n", joinPoint.getSignature().getName());
-			System.out.printf("JJJJJJJJJJJJJJJJJJJJ", joinPoint.getArgs()[0].toString());
-			System.out.printf("\nJJJJJJJJJJJJJJJJJJJJ", joinPoint.getArgs()[1]);
-			System.out.printf("\nJJJJJJJJJJJJJJJJJJJJ", joinPoint.getArgs()[2]);
+
 			sharerId = joinPoint.getArgs()[0].toString();
 			secretId = joinPoint.getArgs()[1].toString();
 			String targetId = joinPoint.getArgs()[2].toString();

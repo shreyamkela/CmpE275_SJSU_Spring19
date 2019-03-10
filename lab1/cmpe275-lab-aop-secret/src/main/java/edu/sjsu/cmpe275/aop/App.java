@@ -17,7 +17,7 @@ public class App {
 		try {
 			// XXXXXXXXXXXXXXXXXX INTERMIXED ADVIDES?
 			// XXXXXXXXXXXXXXXXXX HOW TO THROW? AND SHOULD CODE RUN AFTER ANY THROW? - DONE THE CHECK FOR PERMANENT NETWORK FAILURE WHEN SHARING A SECRET SO THAT THIS SECRET IS NOT COUNTED AS A SHARED SECRET
-			UUID secret = secretService.createSecret(null, "My little secret");
+			UUID secret = secretService.createSecret("Alice", "My little secret");
 			UUID secret1 = secretService.createSecret("Paul", "My little secret");
 			secretService.shareSecret("Alice", secret, "Bob");
 			secretService.shareSecret("Paul", secret1, "Bob");

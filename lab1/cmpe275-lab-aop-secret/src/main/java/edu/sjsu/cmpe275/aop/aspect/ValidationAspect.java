@@ -1,12 +1,8 @@
 package edu.sjsu.cmpe275.aop.aspect;
 
-import java.util.UUID;
-
-import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
@@ -24,7 +20,11 @@ public class ValidationAspect {
 	SecretStatsImpl stats;
 
 	@Around("validateCreateSecretPointcut()")
-	public UUID validateCreateSecretAdvice(ProceedingJoinPoint joinPoint) throws Throwable {
+	public Object validateCreateSecretAdvice(ProceedingJoinPoint joinPoint) throws Throwable {
+
+		if (stats.permanentNetworkFailure == true) {
+			return null;
+		}
 
 		System.out.printf("Doing validation prior to the execution of the method %s\n\n",
 				joinPoint.getSignature().getName());
@@ -66,15 +66,15 @@ public class ValidationAspect {
 			} else if (secretContentLength > stats.lengthOfLongestSecret) {
 				stats.lengthOfLongestSecret = secretContentLength;
 				Object[] args = joinPoint.getArgs();
-				return (UUID) joinPoint.proceed(args);
-				// Statsaspect uses @AfterReturning on createSecret and validationaspect uses @Around on createSecret. @Around will run first. We want returnValue of createSecret into @AfterReturning therefore we must pass the returnValue through @Around return
+				return joinPoint.proceed(args);
+// IMPORTANT - Statssaspect uses @AfterReturning on createSecret and validationaspect uses @Around on createSecret. @Around will run first. We want returnValue of createSecret into @AfterReturning therefore we must pass the returnValue through @Around return
+// Also, if there are 2 joinpoints that can run before or after or around a method, one after the other, then it it very important to take care of passing the method arguments (and returnValue of the method if required) between the joinpoints, then only the successor joinpoint would be able to use the args and returnValue
 			} else {
 				Object[] args = joinPoint.getArgs();
-				return (UUID) joinPoint.proceed(args);
+				return joinPoint.proceed(args);
 			}
 		} else {
-			Object[] args = joinPoint.getArgs();
-			return (UUID) joinPoint.proceed(args);
+			throw new IllegalArgumentException();
 		}
 
 	}
@@ -83,19 +83,22 @@ public class ValidationAspect {
 	public void validateCreateSecretPointcut() {
 	}
 
-	@Before("validateReadSecretPointcut()")
-	public void validateReadSecretAdvice(JoinPoint joinPoint) throws Throwable {
+	@Around("validateReadSecretPointcut()")
+	public Object validateReadSecretAdvice(ProceedingJoinPoint joinPoint) throws Throwable {
+
+		if (stats.permanentNetworkFailure == true) {
+			return null;
+		}
 
 		System.out.printf("\nDoing validation prior to the execution of the method %s\n\n",
 				joinPoint.getSignature().getName());
 
-		if (joinPoint.getArgs()[0] == null) {
+		if (joinPoint.getArgs()[0] == null || joinPoint.getArgs()[1] == null) {
 			// System.out.printf("XXXXXXXXXXXXXXXXXXXXXXXX USER ID OF TARGET USER IS NULL!!!!!!!\n\n");
 			throw new IllegalArgumentException();
-		}
-		if (joinPoint.getArgs()[1] == null) {
-			// System.out.printf("XXXXXXXXXXXXXXXXXXXXXXXX SECRET IS NULL!!!!!!!\n\n");
-			throw new IllegalArgumentException();
+		} else {
+			Object[] args = joinPoint.getArgs();
+			return joinPoint.proceed(args);
 		}
 
 	}
@@ -106,14 +109,20 @@ public class ValidationAspect {
 
 	@Around("validateShareOrUnshareSecretPointcut()")
 	public void validateShareOrUnshareSecretAdvice(ProceedingJoinPoint joinPoint) throws Throwable {
+
+		if (stats.permanentNetworkFailure == true) {
+			return;
+		}
+
 		System.out.printf("\nDoing validation prior to the execution of the method %s\n\n",
 				joinPoint.getSignature().getName());
 
 		if (joinPoint.getArgs()[0] == null || joinPoint.getArgs()[1] == null || joinPoint.getArgs()[2] == null) {
+
 			throw new IllegalArgumentException();
 		} else {
+
 			Object[] args = joinPoint.getArgs();
-			System.out.println("RRRRRRRRRRRRRRRRR");
 			joinPoint.proceed(args);
 		}
 
