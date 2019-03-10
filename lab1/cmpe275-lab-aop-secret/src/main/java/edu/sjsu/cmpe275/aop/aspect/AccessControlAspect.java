@@ -32,10 +32,15 @@ public class AccessControlAspect {
 
 		String readerId = null, sharerUnsharerId = null, secretId = null;
 
+		secretId = joinPoint.getArgs()[1].toString();
+
+		if (stats.secretIdWithCreatorAndContent.containsKey(secretId) == false) { // If the secretId is not a valid secret id i.e it was not created by someone, then throw
+			throw new NotAuthorizedException();
+		}
+
 		if (joinPoint.getArgs().length == 2) { // This method is readSecret
 
 			readerId = joinPoint.getArgs()[0].toString();
-			secretId = joinPoint.getArgs()[1].toString();
 
 			if (stats.accessToSecrets.containsKey(readerId)) {
 				if (stats.accessToSecrets.get(readerId).contains(secretId)) {
@@ -50,7 +55,6 @@ public class AccessControlAspect {
 
 		} else {// This method is either shareSecret or unshareSecret
 			sharerUnsharerId = joinPoint.getArgs()[0].toString();
-			secretId = joinPoint.getArgs()[1].toString();
 
 			if (stats.accessToSecrets.containsKey(sharerUnsharerId)) {
 				if (stats.accessToSecrets.get(sharerUnsharerId).contains(secretId)) {

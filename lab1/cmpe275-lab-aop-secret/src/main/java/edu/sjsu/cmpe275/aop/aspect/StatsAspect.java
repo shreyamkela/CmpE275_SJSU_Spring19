@@ -31,6 +31,10 @@ public class StatsAspect {
 		ArrayList<String> creatorAndContent = new ArrayList<String>();
 		String userId = null, secretContent = null, sharerId = null, secretId = null;
 
+		if (stats.permanentNetworkFailure == true) {
+			return;
+		}
+
 		if (joinPoint.getArgs().length == 2) { // The method is createSecret
 			userId = joinPoint.getArgs()[0].toString(); // This user gets to know this secret
 			secretContent = joinPoint.getArgs()[1].toString();
@@ -157,7 +161,7 @@ public class StatsAspect {
 			secretId = joinPoint.getArgs()[1].toString();
 			sharerId = joinPoint.getArgs()[0].toString();
 
-			if (sharerId == userId) {
+			if (sharerId == userId) { // If one tries to share a secret with themselves
 				return;
 			}
 
@@ -188,14 +192,18 @@ public class StatsAspect {
 		secretId = joinPoint.getArgs()[1].toString();
 		sharerId = joinPoint.getArgs()[0].toString();
 
-		if (sharerId == targetId) {
+		if (sharerId == targetId) { // Unsharing with himself is ignored
 			return;
 		}
 
 		// If A shares a secret with B. Then if B tries to unshare it with A, this should not happen. Therefore if A is the creator of a secret then he cannot be unshared with his own secret
-		if (stats.secretIdWithCreatorAndContent.get(secretId) != null
-				&& stats.secretIdWithCreatorAndContent.get(secretId).get(0) != targetId) { // If targetid is not the creator himself
-			if (stats.accessToSecrets.containsKey(targetId)) { // if targetId is present in accessToSecrets then try to remove secretid. If target id not present then no need to do anything
+		if (stats.secretIdWithCreatorAndContent.get(secretId) != null) {
+			if (stats.accessToSecrets.containsKey(targetId)
+					&& stats.secretIdWithCreatorAndContent.get(secretId).get(0) != targetId
+					&& stats.secretIdWithCreatorAndContent.get(secretId).get(0) == sharerId) {
+				// If targetid is not the creator himself then only he can unshare
+				// If sharerId is the creator himself then only he can unshare
+				// if targetId is present in accessToSecrets then try to remove secretid. If target id not present then no need to do anything
 				(stats.accessToSecrets.get(targetId)).remove(secretId);
 			}
 		}
