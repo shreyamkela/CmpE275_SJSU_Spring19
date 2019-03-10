@@ -22,7 +22,7 @@ public class ValidationAspect {
 	@Around("validateCreateSecretPointcut()")
 	public Object validateCreateSecretAdvice(ProceedingJoinPoint joinPoint) throws Throwable {
 
-		if (stats.permanentNetworkFailure == true) {
+		if (stats.permanentNetworkFailure == true) { // Possibly this check is not required as we are throwing an exception if there is anetwork failure and not proceeding. We wont even reach this advice if there is a network failure
 			return null;
 		}
 

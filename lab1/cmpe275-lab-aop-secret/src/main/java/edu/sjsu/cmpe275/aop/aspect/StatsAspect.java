@@ -31,7 +31,7 @@ public class StatsAspect {
 		ArrayList<String> creatorAndContent = new ArrayList<String>();
 		String userId = null, secretContent = null, sharerId = null, secretId = null;
 
-		if (stats.permanentNetworkFailure == true) {
+		if (stats.permanentNetworkFailure == true) { // Possibly this check is not required as we are throwing an exception if there is anetwork failure and not proceeding. We wont even reach this advice if there is a network failure
 			return;
 		}
 
