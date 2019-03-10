@@ -133,7 +133,72 @@ public class StatsAspect {
 
 		}
 
-		// stats.resetStats();
+		// For access control: createSecret, shareSecret
+		if (stats.permanentNetworkFailure == true) {
+			return;
+		}
+
+		innerHashSet = new HashSet<String>();
+
+		if (joinPoint.getArgs().length == 2) { // createSecret
+			userId = joinPoint.getArgs()[0].toString(); // This user gets to know this secret - this user is target user
+			secretId = returnValue.toString();
+			if (stats.accessToSecrets.containsKey(userId)) {
+				(stats.accessToSecrets.get(userId)).add(secretId);
+				// An element is added to hashset only when it is not already present. Otherwise it returns false. Therefore we dont need to check whether the key userid is already present in the set or not.
+			} else {
+				// If userid is not present
+				innerHashSet.add(secretId);
+				stats.accessToSecrets.put(userId, innerHashSet);
+			}
+
+		} else { // shareSecret
+			userId = joinPoint.getArgs()[2].toString(); // This user gets to know this secret - this user is target user
+			secretId = joinPoint.getArgs()[1].toString();
+			sharerId = joinPoint.getArgs()[0].toString();
+
+			if (sharerId == userId) {
+				return;
+			}
+
+			if (stats.accessToSecrets.containsKey(userId)) {
+				(stats.accessToSecrets.get(userId)).add(secretId);
+				// An element is added to hashset only when it is not already present. Otherwise it returns false. Therefore we dont need to check whether the key userid is already present in the set or not.
+			} else {
+				// If userid is not present
+				innerHashSet.add(secretId);
+				stats.accessToSecrets.put(userId, innerHashSet);
+			}
+
+		}
 	}
 
+	// For access control: unshareSecret
+	@AfterReturning(pointcut = "execution(public * edu.sjsu.cmpe275.aop.SecretService.unshareSecret(..)))", returning = "returnValue")
+	public void AccessControlUnshareSecretAdvice(JoinPoint joinPoint, Object returnValue) {
+		System.out.printf("\nAfter the execution of the method %s\n", joinPoint.getSignature().getName());
+
+		if (stats.permanentNetworkFailure == true) {
+			return;
+		}
+
+		String targetId = null, sharerId = null, secretId = null;
+
+		targetId = joinPoint.getArgs()[2].toString(); // The secret is being unshared with this user
+		secretId = joinPoint.getArgs()[1].toString();
+		sharerId = joinPoint.getArgs()[0].toString();
+
+		if (sharerId == targetId) {
+			return;
+		}
+
+		// If A shares a secret with B. Then if B tries to unshare it with A, this should not happen. Therefore if A is the creator of a secret then he cannot be unshared with his own secret
+		if (stats.secretIdWithCreatorAndContent.get(secretId) != null
+				&& stats.secretIdWithCreatorAndContent.get(secretId).get(0) != targetId) { // If targetid is not the creator himself
+			if (stats.accessToSecrets.containsKey(targetId)) { // if targetId is present in accessToSecrets then try to remove secretid. If target id not present then no need to do anything
+				(stats.accessToSecrets.get(targetId)).remove(secretId);
+			}
+		}
+
+	}
 }
