@@ -1,6 +1,8 @@
 package edu.sjsu.cmpe275.aop;
 
-//Tests included from git repositories - https://github.com/ruchiagarwalcse/CMPE275-Lab1 , https://github.com/vivek29/Cmpe275-Lab1-AOP-SecretShare
+import static org.junit.Assert.assertNotEquals;
+
+//Tests included from git repositories - https://github.com/ruchiagarwalcse/CMPE275-Lab1
 
 import java.io.IOException;
 import java.util.UUID;
@@ -129,4 +131,173 @@ public class SecretServiceTest {
 		// Carl cannot read this secret anymore
 		secretService.readSecret("Carl", aliceSecretId);
 	}
+
+	/**
+	 * TestF: Alice shares a secret with Bob and Carl; Carl shares it with Bob, then Alice unshares it with Bob; Bob cannot read this secret anymore.
+	 * 
+	 * @throws IOException
+	 * @throws NotAuthorizedException
+	 * @throws IllegalArgumentException
+	 * @result Unauthorized exception occurs.
+	 */
+	@Test(expected = NotAuthorizedException.class)
+	public void testF() throws IllegalArgumentException, NotAuthorizedException, IOException {
+
+		System.out.println("testF");
+
+		// Alice shares a secret with Bob and Carl
+		UUID aliceSecretId = secretService.createSecret("Alice", "My little secret");
+		secretService.shareSecret("Alice", aliceSecretId, "Bob");
+		secretService.shareSecret("Alice", aliceSecretId, "Carl");
+
+		// Carl shares it with Bob
+		secretService.shareSecret("Carl", aliceSecretId, "Bob");
+
+		// Alice unshares it with Bob
+		secretService.unshareSecret("Alice", aliceSecretId, "Bob");
+
+		// Bob cannot read this secret anymore
+		secretService.readSecret("Bob", aliceSecretId);
+	}
+
+	/**
+	 * TestG: Alice shares a secret with Bob; Bob shares it with Carl, and then unshares it with Carl. Carl can still read this secret, as Bob didn't create this secret.
+	 * 
+	 * @throws IOException
+	 * @throws NotAuthorizedException
+	 * @throws IllegalArgumentException
+	 * @result Carl can still read this secret.
+	 */
+	@Test
+	public void testG() throws IllegalArgumentException, NotAuthorizedException, IOException {
+
+		System.out.println("testG");
+
+		// Alice shares a secret with Bob
+		UUID aliceSecretId = secretService.createSecret("Alice", "My little secret");
+		secretService.shareSecret("Alice", aliceSecretId, "Bob");
+
+		// Bob shares it with Carl
+		secretService.shareSecret("Bob", aliceSecretId, "Carl");
+
+		// Bob unshares it with Carl
+		secretService.unshareSecret("Bob", aliceSecretId, "Carl");
+
+		// Carl can still read this secret
+		secretService.readSecret("Carl", aliceSecretId);
+	}
+
+	/**
+	 * TestH: Alice shares a secret with Bob; Carl unshares it with Bob, and encounters UnauthorizedException.
+	 * 
+	 * @throws IOException
+	 * @throws NotAuthorizedException
+	 * @throws IllegalArgumentException
+	 * @result Unauthorized exception occurs.
+	 */
+	@Test(expected = NotAuthorizedException.class)
+	public void testH() throws IllegalArgumentException, NotAuthorizedException, IOException {
+
+		System.out.println("testH");
+
+		// Alice shares a secret with Bob
+		UUID aliceSecretId = secretService.createSecret("Alice", "My little secret");
+		secretService.shareSecret("Alice", aliceSecretId, "Bob");
+
+		// Carl unshares it with Bob, and encounters UnauthorizedException
+		secretService.unshareSecret("Carl", aliceSecretId, "Bob");
+	}
+
+	/**
+	 * TestI: Alice shares a secret with Bob; Bob shares it with Carl; Alice unshares it with Bob; Bob shares it with Carl with again, and encounters UnauthorizedException.
+	 * 
+	 * @throws IOException
+	 * @throws NotAuthorizedException
+	 * @throws IllegalArgumentException
+	 * @result Unauthorized exception occurs.
+	 */
+	@Test(expected = NotAuthorizedException.class)
+	public void testI() throws IllegalArgumentException, NotAuthorizedException, IOException {
+
+		System.out.println("testI");
+
+		// Alice shares a secret with Bob
+		UUID aliceSecretId = secretService.createSecret("Alice", "My little secret");
+		secretService.shareSecret("Alice", aliceSecretId, "Bob");
+
+		// Bob shares it with Carl
+		secretService.shareSecret("Bob", aliceSecretId, "Carl");
+
+		// Alice unshares it with Bob
+		secretService.unshareSecret("Alice", aliceSecretId, "Bob");
+
+		// Bob shares it with Carl again and encounters UnauthorizedException.
+		secretService.shareSecret("Bob", aliceSecretId, "Carl");
+	}
+
+	/**
+	 * TestJ: Alice stores the same secret object twice, and get two different UUIDs.
+	 * 
+	 * @throws IOException
+	 * @throws IllegalArgumentException
+	 * @result Alice gets two different UUIDs.
+	 */
+	@Test
+	public void testJ() throws IllegalArgumentException, IOException {
+
+		System.out.println("testJ");
+
+		// Alice stores the secret
+		UUID aliceSecretId1 = secretService.createSecret("Alice", "My little secret");
+
+		// Alice stores again the same secret
+		UUID aliceSecretId2 = secretService.createSecret("Alice", "My little secret");
+
+		// Alice get two different UUIDs
+		assertNotEquals(aliceSecretId1, aliceSecretId2);
+	}
+
+	/**
+	 * TestK: null as an argument in the different methods
+	 * 
+	 * @throws IOException
+	 * @throws IllegalArgumentException
+	 * @result IllegalArgumentException thrown
+	 */
+	@Test(expected = IllegalArgumentException.class)
+	public void testK() throws IllegalArgumentException, IOException {
+
+		System.out.println("testK");
+
+		// Alice stores the secret
+		UUID aliceSecretId1 = secretService.createSecret("Alice", "My little secret");
+		// UUID aliceSecretId1 = secretService.createSecret("Alice", null);
+		secretService.shareSecret("Alice", aliceSecretId1, "Bob");
+		// secretService.unshareSecret("Alice", aliceSecretId1, "Bob");
+		secretService.readSecret("Bob", null);
+
+	}
+
+	/**
+	 * TestL: Network Failure - Add to SecretServiceImpl.java under readSecret method throw new IOException("Retry");
+	 * 
+	 * 
+	 * @throws IOException
+	 * @throws IllegalArgumentException
+	 * @result Alice gets two different UUIDs.
+	 */
+//	@Test(expected = IOException.class)
+//	public void testL() throws IllegalArgumentException, IOException {
+//
+//		System.out.println("testL");
+//
+//		// Alice stores the secret
+//		UUID aliceSecretId1 = secretService.createSecret("Alice", "My little secret");
+//		// UUID aliceSecretId1 = secretService.createSecret("Alice", null);
+//		secretService.shareSecret("Alice", aliceSecretId1, "Bob");
+//		// secretService.unshareSecret("Alice", aliceSecretId1, "Bob");
+//		secretService.readSecret("Bob", aliceSecretId1);
+//
+//	}
+
 }
