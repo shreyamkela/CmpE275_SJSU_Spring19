@@ -15,12 +15,17 @@ public class SecretServiceTest {
 
 	// Secret service object
 	private SecretService secretService;
+	// Secret stats object
+	private SecretStats stats;
 
 	// Test set up
 	@Before
 	public void setUp() throws Exception {
+
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("context.xml");
 		secretService = context.getBean("secretService", SecretService.class);
+		stats = context.getBean("secretStats", SecretStats.class);
+
 	}
 
 	/**
@@ -299,5 +304,25 @@ public class SecretServiceTest {
 //		secretService.readSecret("Bob", aliceSecretId1);
 //
 //	}
+
+	/**
+	 * TestM: Reset all - Alice shares a secret with Bob. Bob reads the secret. Then system is reset. Bob should not be able to read the secret
+	 * 
+	 * @throws IOException
+	 * @throws IllegalArgumentException
+	 * @result NotAuthorizedException thrown
+	 */
+	@Test(expected = NotAuthorizedException.class)
+	public void testM() throws IllegalArgumentException, IOException {
+
+		System.out.println("testM");
+
+		UUID secret = secretService.createSecret("Alice", "My little secret");
+		secretService.shareSecret("Alice", secret, "Bob");
+		secretService.readSecret("Bob", secret);
+		stats.resetStatsAndSystem();
+		secretService.readSecret("Bob", secret);
+
+	}
 
 }

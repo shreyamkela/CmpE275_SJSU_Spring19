@@ -52,7 +52,6 @@ public class SecretStatsImpl implements SecretStats {
 		creatorSecrets.clear();
 		accessToSecrets.clear();
 		permanentNetworkFailure = false;
-
 	}
 
 	@Override

@@ -15,19 +15,24 @@ public class App {
 		SecretStats stats = (SecretStats) ctx.getBean("secretStats");
 
 		try {
-			// XXXXXXXXXXXXXXXXXX INTERMIXED ADVIDES?
-			// XXXXXXXXXXXXXXXXXX HOW TO THROW? AND SHOULD CODE RUN AFTER ANY THROW? - DONE THE CHECK FOR PERMANENT NETWORK FAILURE WHEN SHARING A SECRET SO THAT THIS SECRET IS NOT COUNTED AS A SHARED SECRET
+
+//			UUID secret = secretService.createSecret("Alice", "My little secret");
+//			UUID secret1 = secretService.createSecret("Paul", "My little secret");
+//			secretService.shareSecret("Alice", secret, "Bob");
+//			secretService.shareSecret("Alice", secret, "Paul");
+//			secretService.shareSecret("Paul", secret1, "Bob");
+//			secretService.readSecret("Bob", secret);
+//			secretService.unshareSecret("Paul", secret, "Bob");
+//			secretService.readSecret("Bob", secret);
+//			stats.resetStatsAndSystem();
+//			UUID secret2 = secretService.createSecret("Alice", "My little secret");
+//			secretService.shareSecret("Alice", secret2, "Bob");
+
 			UUID secret = secretService.createSecret("Alice", "My little secret");
-			UUID secret1 = secretService.createSecret("Paul", "My little secret");
 			secretService.shareSecret("Alice", secret, "Bob");
-			secretService.shareSecret("Alice", secret, "Paul");
-			secretService.shareSecret("Paul", secret1, "Bob");
-			secretService.readSecret("Bob", secret);
-			secretService.unshareSecret("Paul", secret, "Bob");
 			secretService.readSecret("Bob", secret);
 			stats.resetStatsAndSystem();
-			UUID secret2 = secretService.createSecret("Alice", "My little secret");
-			secretService.shareSecret("Alice", secret2, "Bob");
+			secretService.readSecret("Bob", secret);
 
 		} catch (Exception e) {
 			e.printStackTrace();
