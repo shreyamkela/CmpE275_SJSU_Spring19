@@ -81,7 +81,7 @@ public class StatsAspect {
 
 					innerHashSet1.add(secretId);
 					// innerHashMap.put(sharerId, innerHashSet1);
-					stats.creatorSecrets.get(sharerId).put(sharerId, innerHashSet1);
+					stats.creatorSecrets.get(sharerId).put(userId, innerHashSet1);
 				}
 			} else {
 				// If sharer not present
