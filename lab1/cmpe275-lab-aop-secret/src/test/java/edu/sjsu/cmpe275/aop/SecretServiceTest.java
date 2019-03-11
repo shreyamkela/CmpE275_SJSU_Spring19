@@ -286,7 +286,7 @@ public class SecretServiceTest {
 	}
 
 	/**
-	 * TestL: Network Failure - Add to SecretServiceImpl.java under readSecret method throw new IOException("Retry");
+	 * TestL: Network Failure - To run this test, add the following under readSecret() method in the SecretServiceImpl.java file - throw new IOException();
 	 * 
 	 * 
 	 * @throws IOException
@@ -424,6 +424,42 @@ public class SecretServiceTest {
 		String worstSecretKeeper = stats.getWorstSecretKeeper();
 		assertEquals(mostTrusted, "Ben");
 		assertEquals(worstSecretKeeper, "Alice");
+	}
+
+	/**
+	 * TestQ: Throw IllegalArgumentException when length of secret exceeds 100 - Secret "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum will now end.." has 101 characters.
+	 *
+	 * @throws IOException
+	 * @throws IllegalArgumentException
+	 * @result NotAuthorizedException thrown
+	 */
+	@Test(expected = IllegalArgumentException.class)
+	public void testQ() throws IllegalArgumentException, IOException {
+
+		System.out.println("testQ");
+
+		UUID secret = secretService.createSecret("Alice",
+				"Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum will now end..");
+
+	}
+
+	/**
+	 * TestR: Create a new secret object, without any user. Sharing this user object should throw NotAuthorizedException as it was not created by that user.
+	 *
+	 * @throws IOException
+	 * @throws IllegalArgumentException
+	 * @result NotAuthorizedException thrown
+	 */
+	@Test(expected = NotAuthorizedException.class)
+	public void testR() throws IllegalArgumentException, IOException {
+
+		System.out.println("testR");
+
+		UUID secret = new UUID(0, 0);
+		secretService.shareSecret("Alice", secret, "Ben");
+//		secretService.shareSecret("Alice", secret, "Ben");
+//		secretService.readSecret("Ben", secret);
+
 	}
 
 }
