@@ -27,7 +27,7 @@ public class SecretServiceTest {
 		secretService = context.getBean("secretService", SecretService.class);
 		stats = context.getBean("secretStats", SecretStats.class);
 		// context.close(); // Dont close context here are resetStats doesnt work while testing if we close the context - resetStats does not clear the objects if context is closed
-
+		// FIXME: Add a context close after all the tests are done so that there is no resourse leak - Using @After?
 	}
 
 	/**

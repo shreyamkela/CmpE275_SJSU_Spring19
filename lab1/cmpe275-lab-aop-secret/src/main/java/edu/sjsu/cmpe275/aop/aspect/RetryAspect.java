@@ -1,3 +1,7 @@
+/**
+* @author Shreyam Kela - Student Id 013775411
+*/
+
 package edu.sjsu.cmpe275.aop.aspect;
 
 import java.io.IOException;
@@ -5,7 +9,6 @@ import java.io.IOException;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 
@@ -18,7 +21,7 @@ public class RetryAspect {
 	@Autowired
 	SecretStatsImpl stats;
 
-	@Around("networkFailureRetryPointcut()")
+	@Around("execution(public * edu.sjsu.cmpe275.aop.SecretService.*(..))")
 	public Object networkFailureRetryAdvice(ProceedingJoinPoint joinPoint) throws Throwable { // @around should always return something an object
 		// System.out.printf("Retry aspect prior to the execution of the method %s\n", joinPoint.getSignature().getName());
 
@@ -63,10 +66,6 @@ public class RetryAspect {
 			}
 		}
 		return null;
-	}
-
-	@Pointcut("execution(public * edu.sjsu.cmpe275.aop.SecretService.*(..))")
-	public void networkFailureRetryPointcut() {
 	}
 
 }

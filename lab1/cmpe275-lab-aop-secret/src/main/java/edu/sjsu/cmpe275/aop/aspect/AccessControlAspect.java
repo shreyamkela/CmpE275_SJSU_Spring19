@@ -1,9 +1,12 @@
+/**
+* @author Shreyam Kela - Student Id 013775411
+*/
+
 package edu.sjsu.cmpe275.aop.aspect;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 
@@ -17,7 +20,7 @@ public class AccessControlAspect {
 	@Autowired
 	SecretStatsImpl stats;
 
-	@Around("accessControlPointcut()")
+	@Around("execution(public * edu.sjsu.cmpe275.aop.SecretService.readSecret(..)) || execution(public * edu.sjsu.cmpe275.aop.SecretService.shareSecret(..)) || execution(public * edu.sjsu.cmpe275.aop.SecretService.unshareSecret(..))")
 	public Object accessControlAdvice(ProceedingJoinPoint joinPoint) throws Throwable {
 
 		if (stats.permanentNetworkFailure == true) { // Possibly this check is not required as we are throwing an exception if there is anetwork failure and not proceeding. We wont even reach this advice if there is a network failure
@@ -67,9 +70,4 @@ public class AccessControlAspect {
 		}
 
 	}
-
-	@Pointcut("execution(public * edu.sjsu.cmpe275.aop.SecretService.readSecret(..)) || execution(public * edu.sjsu.cmpe275.aop.SecretService.shareSecret(..)) || execution(public * edu.sjsu.cmpe275.aop.SecretService.unshareSecret(..))")
-	public void accessControlPointcut() {
-	}
-
 }
