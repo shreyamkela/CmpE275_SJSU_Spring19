@@ -522,4 +522,37 @@ public class SecretServiceTest {
 
 	}
 
+	/**
+	 * TestU: An empty string user creates a secret and shares it with Bob. Alice creates a secret and shares it with Bob. Worst secret keeper should be "" as alphabetically it precedes Alice
+	 *
+	 * @throws IOException
+	 * @throws IllegalArgumentException
+	 * @result NotAuthorizedException thrown
+	 */
+	@Test
+	public void testU() throws IllegalArgumentException, IOException {
+
+		System.out.println("testU");
+
+		UUID secret = secretService.createSecret("", "A little secret");
+		UUID secret1 = secretService.createSecret("Alice", "My little secret");
+		secretService.shareSecret("", secret, "Bob");
+		secretService.shareSecret("Alice", secret1, "Bob");
+		secretService.readSecret("Bob", secret);
+		secretService.readSecret("Bob", secret1);
+		String bestKnown = stats.getBestKnownSecret();
+		String mostTrusted = stats.getMostTrustedUser();
+		String worstSecretKeeper = stats.getWorstSecretKeeper();
+		int longest = stats.getLengthOfLongestSecret();
+//		System.out.println(bestKnown);
+//		System.out.println(longest);
+//		System.out.println(worstSecretKeeper);
+//		System.out.println(mostTrusted);
+		assertEquals(bestKnown, "A little secret");
+		assertEquals(mostTrusted, "Bob");
+		assertEquals(worstSecretKeeper, "");
+		assertEquals(longest, 16);
+
+	}
+
 }
