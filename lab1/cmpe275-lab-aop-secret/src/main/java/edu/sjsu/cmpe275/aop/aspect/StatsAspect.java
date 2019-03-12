@@ -40,7 +40,12 @@ public class StatsAspect {
 
 		if (joinPoint.getArgs().length == 2) { // The method is createSecret
 			userId = joinPoint.getArgs()[0].toString(); // This user gets to know this secret
-			secretContent = joinPoint.getArgs()[1].toString();
+			if (joinPoint.getArgs()[1] != null) { // If secret content is null then pass an empty string forwards
+				secretContent = joinPoint.getArgs()[1].toString();
+			} else {
+				secretContent = "";
+			}
+
 			creatorAndContent.add(userId); // Adding the creator of this secret
 			creatorAndContent.add(secretContent); // Adding the secret content
 
@@ -141,6 +146,7 @@ public class StatsAspect {
 
 		if (joinPoint.getArgs().length == 2) { // createSecret
 			userId = joinPoint.getArgs()[0].toString(); // This user gets to know this secret - this user is target user
+
 			secretId = returnValue.toString();
 			if (stats.accessToSecrets.containsKey(userId)) {
 				(stats.accessToSecrets.get(userId)).add(secretId);

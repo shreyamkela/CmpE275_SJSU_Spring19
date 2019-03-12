@@ -492,4 +492,34 @@ public class SecretServiceTest {
 
 	}
 
+	/**
+	 * TestT: Alice creates "My little secret" and then shares the secret to herself and then unshares it with herself. Both of these actions should not affect Most Trusted User/Worst Secret Keeper stats and they should remain null. Also, Alice should
+	 * still be able to read the secret. Plus, as no user other than the creator herself has been shared with any secrets, Best known secrets should be null as well.
+	 *
+	 * @throws IOException
+	 * @throws IllegalArgumentException
+	 * @result NotAuthorizedException thrown
+	 */
+	@Test
+	public void testT() throws IllegalArgumentException, IOException {
+
+		System.out.println("testT");
+
+		UUID secret = secretService.createSecret("Alice", null);
+		secretService.shareSecret("Alice", secret, "Bob");
+		secretService.readSecret("Bob", secret);
+		String bestKnown = stats.getBestKnownSecret();
+		String mostTrusted = stats.getMostTrustedUser();
+		String worstSecretKeeper = stats.getWorstSecretKeeper();
+		int longest = stats.getLengthOfLongestSecret();
+		System.out.println(bestKnown);
+		System.out.println(longest);
+		System.out.println(worstSecretKeeper);
+		System.out.println(mostTrusted);
+//		assertEquals(bestKnown, null);
+//		assertEquals(mostTrusted, null);
+//		assertEquals(worstSecretKeeper, null);
+
+	}
+
 }

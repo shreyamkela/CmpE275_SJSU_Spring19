@@ -36,28 +36,31 @@ public class ValidationAspect {
 		// joinPoint.getArgs()[0]: Object containing the userid passed. Validation - User id object can be null or user id object can contain a string which is empty
 		// joinPoint.getArgs()[1]: Object containing the secretContent passed. Validation - secretContent object can be null or secretContent string can be more than 100 characters. We dont check if secretContent string is empty
 
+		int secretContentLength;
+
 		if (joinPoint.getArgs()[0] == null) {
 			throw new IllegalArgumentException();
 		}
 
-		if (joinPoint.getArgs()[1] != null) {
-			int secretContentLength = joinPoint.getArgs()[1].toString().length();
-			if (secretContentLength > 100) {
-				throw new IllegalArgumentException();
-			} else if (secretContentLength > stats.lengthOfLongestSecret) {
-				stats.lengthOfLongestSecret = secretContentLength;
-				Object[] args = joinPoint.getArgs();
-				return joinPoint.proceed(args);
-				// IMPORTANT - StatsAspect uses @AfterReturning on createSecret and validationaspect uses @Around on createSecret. @Around will run first. We want returnValue of createSecret into @AfterReturning therefore we must pass the returnValue through @Around
-				// return
-				// Also, if there are 2 joinpoints that can run before or after or around a method, one after the other, then it it very important to take care of passing the method arguments (and returnValue of the method if required) between the joinpoints, then
-				// only the successor joinpoint would be able to use the args and returnValue
-			} else {
-				Object[] args = joinPoint.getArgs();
-				return joinPoint.proceed(args);
-			}
+		if (joinPoint.getArgs()[1] != null) { // If secret content is null we dont throw exception
+			secretContentLength = joinPoint.getArgs()[1].toString().length();
 		} else {
+			secretContentLength = 0;
+		}
+
+		if (secretContentLength > 100) {
 			throw new IllegalArgumentException();
+		} else if (secretContentLength > stats.lengthOfLongestSecret) {
+			stats.lengthOfLongestSecret = secretContentLength;
+			Object[] args = joinPoint.getArgs();
+			return joinPoint.proceed(args);
+			// IMPORTANT - StatsAspect uses @AfterReturning on createSecret and validationaspect uses @Around on createSecret. @Around will run first. We want returnValue of createSecret into @AfterReturning therefore we must pass the returnValue through @Around
+			// return
+			// Also, if there are 2 joinpoints that can run before or after or around a method, one after the other, then it it very important to take care of passing the method arguments (and returnValue of the method if required) between the joinpoints, then
+			// only the successor joinpoint would be able to use the args and returnValue
+		} else {
+			Object[] args = joinPoint.getArgs();
+			return joinPoint.proceed(args);
 		}
 
 	}
