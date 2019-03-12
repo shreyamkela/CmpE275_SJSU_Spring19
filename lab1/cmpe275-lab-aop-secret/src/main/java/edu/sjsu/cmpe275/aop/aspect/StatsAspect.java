@@ -43,7 +43,7 @@ public class StatsAspect {
 			if (joinPoint.getArgs()[1] != null) { // If secret content is null then pass an empty string forwards
 				secretContent = joinPoint.getArgs()[1].toString();
 			} else {
-				secretContent = "";
+				secretContent = null;
 			}
 
 			creatorAndContent.add(userId); // Adding the creator of this secret

@@ -176,8 +176,7 @@ public class SecretStatsImpl implements SecretStats {
 					// innerHashSet contains all the user that this secret was shared with. If innerhashset.soze == 1 and innerhashset contains only the creator of this secret himself, then it means no one has read this secret and only creator knows about this secret,
 					// therefore we dont count this case
 					String creator = null;
-//					System.out.println(secretIdWithCreatorAndContent);
-//					System.out.println(key);
+
 					for (String keyId : secretIdWithCreatorAndContent.keySet()) {
 						if (secretIdWithCreatorAndContent.get(keyId).get(1) == key) {
 							creator = secretIdWithCreatorAndContent.get(keyId).get(0);
@@ -191,11 +190,35 @@ public class SecretStatsImpl implements SecretStats {
 
 				if (bestKnownCount < innerHashSet.size()) {
 					bestKnownCount = innerHashSet.size();
-					bestKnownSecret = key;
+					if (key == null) { // Best known secret can be null
+						bestKnownSecret = null;
+					} else {
+						bestKnownSecret = key;
+					}
+
 				} else if (bestKnownCount == innerHashSet.size() && bestKnownCount != 0) {
 					// Checking for a tie case
-					if (bestKnownSecret.compareTo(key) > 0) {
-						bestKnownSecret = key;
+
+					String tempBestKnownSecret, tempKey; // bestKnownSecret and the key have to be compared, but bestKnownSecret and key can both be null, therefore we have to check for null before comparing
+
+					if (bestKnownSecret == null) {
+						tempBestKnownSecret = "";
+					} else {
+						tempBestKnownSecret = bestKnownSecret;
+					}
+
+					if (key == null) {
+						tempKey = "";
+					} else {
+						tempKey = key;
+					}
+
+					if (tempBestKnownSecret.compareTo(tempKey) > 0) {
+						if (key == null) {
+							bestKnownSecret = null;
+						} else {
+							bestKnownSecret = key;
+						}
 					}
 				}
 			}

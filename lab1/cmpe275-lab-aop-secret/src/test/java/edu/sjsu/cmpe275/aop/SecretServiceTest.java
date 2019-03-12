@@ -493,8 +493,8 @@ public class SecretServiceTest {
 	}
 
 	/**
-	 * TestT: Alice creates "My little secret" and then shares the secret to herself and then unshares it with herself. Both of these actions should not affect Most Trusted User/Worst Secret Keeper stats and they should remain null. Also, Alice should
-	 * still be able to read the secret. Plus, as no user other than the creator herself has been shared with any secrets, Best known secrets should be null as well.
+	 * TestT: Alice creates a null secret and a "My little secret" and then shares both secrets with Bob. Code shouldnt crash because of secret being null. Also, in best known secret, it can be either null or "My little secret". Both are correct as we
+	 * cannot compare null and "My little secret" alphabetically, therefore adjust your testing according to your implementation.
 	 *
 	 * @throws IOException
 	 * @throws IllegalArgumentException
@@ -506,19 +506,19 @@ public class SecretServiceTest {
 		System.out.println("testT");
 
 		UUID secret = secretService.createSecret("Alice", null);
+		UUID secret1 = secretService.createSecret("Alice", "My little secret");
 		secretService.shareSecret("Alice", secret, "Bob");
+		secretService.shareSecret("Alice", secret1, "Bob");
 		secretService.readSecret("Bob", secret);
+		secretService.readSecret("Bob", secret1);
 		String bestKnown = stats.getBestKnownSecret();
 		String mostTrusted = stats.getMostTrustedUser();
 		String worstSecretKeeper = stats.getWorstSecretKeeper();
 		int longest = stats.getLengthOfLongestSecret();
-		System.out.println(bestKnown);
-		System.out.println(longest);
-		System.out.println(worstSecretKeeper);
-		System.out.println(mostTrusted);
-//		assertEquals(bestKnown, null);
-//		assertEquals(mostTrusted, null);
-//		assertEquals(worstSecretKeeper, null);
+		assertEquals(bestKnown, null); // According to current implementation, we have adjusted the best known secret test case
+		assertEquals(mostTrusted, "Bob");
+		assertEquals(worstSecretKeeper, "Alice");
+		assertEquals(longest, 16);
 
 	}
 
